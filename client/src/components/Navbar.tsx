@@ -7,7 +7,7 @@ export default function Navbar() {
     <nav className="border-b">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link to="/" className="text-xl font-bold">
-          Nom Nom Now
+          Hello Baby
         </Link>
 
         <div className="flex items-center gap-4">
