@@ -54,7 +54,7 @@ nom-nom-now/
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/sarbeshkc/nom-nom-now
 cd nom-nom-now
 ```
 
