@@ -4,8 +4,11 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { successResponse, errorResponse } from '../utils/response';
 import { constants } from '../config/constants';
+import dotenv from 'dotenv';
 
 const prisma = new PrismaClient();
+const JWT_SECRET = "468f637742d5a13c9e7f2b1a5bcea268150df4822158a3ff99f4f2f37d84a6095fac9c7c8b0c9ba137ec8f36c9cd22b54054e20cb8ab2599f34d23a8ad3bb43a"
+
 
 export const AuthController = {
   signup: async (req: Request, res: Response) => {

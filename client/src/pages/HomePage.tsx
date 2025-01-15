@@ -1,5 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { TestConnection } from "@/components/TestConnection";
+import  Home  from "@/pages/page"
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -10,9 +11,9 @@ export default function HomePage() {
         <h1 className="text-4xl font-bold mb-6">Welcome {user?.name}!</h1>
         
         <div className="grid gap-6">
-          <TestConnection />
+          <Home/>
           
-          <div className="bg-white rounded-lg shadow p-6">
+          {/* <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-2xl font-semibold mb-4">Featured Restaurants</h2>
             <p className="text-gray-600">
               Start exploring restaurants near you...
@@ -24,7 +25,7 @@ export default function HomePage() {
             <p className="text-gray-600">
               Your order history will appear here...
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
