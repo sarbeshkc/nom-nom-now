@@ -1,40 +1,52 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import MainLayout from "@/layouts/MainLayout";
 import LoginPage from "@/pages/auth/LoginPage";
 import SignupPage from "@/pages/auth/SignupPage";
-import MainLayout from "@/layouts/MainLayout";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import HomePage from "@/pages/HomePage";
+import ContactPage from "@/pages/contact/page";
+import ReservationPage from "@/pages/reservation/page";
+import OrderPage from "@/pages/order/page";
+import MenuPage from "@/pages/menu/page";
 
-// Configure future flags
-import { FUTURE_FLAGS } from "@/config/constants";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-
-const router = createBrowserRouter([
+// Define the routes using createBrowserRouter
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <MainLayout />,
+      children: [
+        {
+          index: true,
+          element: (
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          ),
+        },
+        { path: "menu", element: <MenuPage /> },
+        { path: "order", element: <OrderPage /> },
+        { path: "reservation", element: <ReservationPage /> },
+        { path: "contact", element: <ContactPage /> },
+      ],
+    },
+    {
+      path: "/login",
+      element: <LoginPage />,
+    },
+    {
+      path: "/signup",
+      element: <SignupPage />,
+    },
+  ],
   {
-    path: "/",
-    element: <MainLayout />,
-    children: [
-      {
-        index: true,
-        element: <ProtectedRoute><HomePage /></ProtectedRoute>,
-      }
-    ],
-  },
-  {
-    path: "/login",
-    element: <LoginPage />,
-  },
-  {
-    path: "/signup",
-    element: <SignupPage />,
-  },
-], {
-  future: {
-    v7_startTransition: true,
-    v7_relativeSplatPath: true,
-  },
-});
+    future: {
+      v7_startTransition: true,
+      v7_relativeSplatPath: true,
+    },
+  }
+);
 
 function App() {
   return (
