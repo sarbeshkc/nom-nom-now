@@ -97,11 +97,11 @@ const HomePage = () => {
             <div>
               <h1 className="text-6xl font-bold leading-tight mb-6">
                 Bringing your cravings to your door,{' '}
-                <span className="text-[#F1954B]">fresh and fast.</span>
+                <span className="text-[#FF4500]">fresh and fast.</span>
               </h1>
               <p className="text-lg text-gray-600 mb-8">
                 At <span className="font-semibold">Nom Nom Now</span>,{' '}
-                <span className="text-[#F1954B]">we're here to deliver the flavors you crave, right to your doorstep.</span>{' '}
+                <span className="text-[#FF4500]">we're here to deliver the flavors you crave, right to your doorstep.</span>{' '}
                 Whether it's a quick snack or a hearty meal, we ensure every order arrives{' '}
                 <span className="font-semibold">fresh</span>,{' '}
                 <span className="font-semibold">fast</span>, and{' '}
@@ -112,7 +112,7 @@ const HomePage = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <Input placeholder="Search for dishes..." className="pl-10 bg-gray-50" />
                 </div>
-                <Button className="bg-[#FF780B] hover:bg-[#F1954B]/90">
+                <Button className="bg-[#FF4500] hover:bg-[#FF4500]/90">
                   How To Order
                 </Button>
               </div>
@@ -144,7 +144,7 @@ const HomePage = () => {
         <section className="container mx-auto px-4 py-12">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-4xl font-bold">Popular Dishes</h2>
-            <Button variant="ghost" className="text-[#F1954B]">
+            <Button variant="ghost" className="text-[#FF4500]">
               View All <ChevronRight className="ml-1 h-4 w-4" />
             </Button>
           </div>
@@ -160,11 +160,11 @@ const HomePage = () => {
                     className="w-full h-full object-cover"
                   /> */}
                 </div>
-                <h3 className="text-xl font-semibold text-[#F1954B] mb-2">{dish.name}</h3>
+                <h3 className="text-xl font-semibold text-[#FF4500] mb-2">{dish.name}</h3>
                 <p className="text-gray-600 text-sm mb-4">{dish.description}</p>
                 <div className="flex justify-between items-center">
                   <span className="text-green-600 font-medium">Rs. {dish.price}</span>
-                  <Button className="bg-[#F1954B] hover:bg-[#F1954B]/90">
+                  <Button className="bg-[#FF4500] hover:bg-[#FF4500]/90">
                     Add To Cart
                   </Button>
                 </div>
@@ -177,7 +177,7 @@ const HomePage = () => {
         <section className="container mx-auto px-4 py-12">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-4xl font-bold">Newest Recipes</h2>
-            <Button variant="ghost" className="text-[#F1954B]">
+            <Button variant="ghost" className="text-[#FF4500]">
               View All <ChevronRight className="ml-1 h-4 w-4" />
             </Button>
           </div>
@@ -193,7 +193,7 @@ const HomePage = () => {
                     className="w-full h-full object-cover"
                   /> */}
                 </div>
-                <h3 className="text-xl font-semibold text-[#F1954B] mb-4">{recipe.name}</h3>
+                <h3 className="text-xl font-semibold text-[#FF4500] mb-4">{recipe.name}</h3>
                 <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
                   <div>
                     <p className="font-medium">Time</p>
@@ -215,17 +215,17 @@ const HomePage = () => {
             <div>
               <h2 className="text-4xl font-bold mb-4">
                 Do You Have any{' '}
-                <span className="text-[#F1954B]">Dinner Plans</span> today?{' '}
-                <span className="text-[#F1954B]">Reserve</span> Your Table?
+                <span className="text-[#FF4500]">Dinner Plans</span> today?{' '}
+                <span className="text-[#FF4500]">Reserve</span> Your Table?
               </h2>
               <p className="text-gray-600 mb-6">
                 Book your table{' '}
-                <span className="text-[#F1954B]">instantly, read genuine reviews, and</span>{' '}
+                <span className="text-[#FF4500]">instantly, read genuine reviews, and</span>{' '}
                 earn rewards for every reservation. With Nom Nom Now,{' '}
-                <span className="text-[#F1954B]">dining out becomes effortless and rewarding</span>—
+                <span className="text-[#FF4500]">dining out becomes effortless and rewarding</span>—
                 reserve in real-time and enjoy exclusive perks!
               </p>
-              <Button className="bg-[#F1954B] hover:bg-[#F1954B]/90">
+              <Button className="bg-[#FF4500] hover:bg-[#FF4500]/90">
                 Make Reservation
               </Button>
             </div>
@@ -256,7 +256,7 @@ const HomePage = () => {
                     className="w-full h-full object-cover"
                   /> */}
                 </div>
-                <h3 className="text-xl font-semibold text-[#F1954B] mb-2">{category.name}</h3>
+                <h3 className="text-xl font-semibold text-[#FF4500] mb-2">{category.name}</h3>
                 <p className="text-gray-600 text-sm mb-4">{category.description}</p>
                 <Button variant="outline" className="w-full">
                   View All

@@ -9,6 +9,7 @@ import ContactPage from "@/pages/contact/page";
 import ReservationPage from "@/pages/reservation/page";
 import OrderPage from "@/pages/order/page";
 import MenuPage from "@/pages/menu/page";
+import Home from "./pages/page";
 
 // Define the routes using createBrowserRouter
 const router = createBrowserRouter(
@@ -25,6 +26,7 @@ const router = createBrowserRouter(
             </ProtectedRoute>
           ),
         },
+        { path: "home", element: <Home />},
         { path: "menu", element: <MenuPage /> },
         { path: "order", element: <OrderPage /> },
         { path: "reservation", element: <ReservationPage /> },

@@ -24,7 +24,7 @@ export function Footer() {
   ]
 
   return (
-    <footer className="bg-[#FF4D00] text-white">
+    <footer className="bg-[#F1954B] text-white">
       <div className="container mx-auto px-6 py-12">
         <div className="mb-12">
           <img
