@@ -1,9 +1,9 @@
 export function TeamSection() {
     const team = [
-      { name: 'Aarav Sharma', role: 'Founder & CEO' },
-      { name: 'Priya Patel', role: 'Operations Manager' },
-      { name: 'Rohan KC', role: 'Head Chef' },
-      { name: 'Maya Gurung', role: 'Customer Relations' }
+      { name: 'Sarbesh KC', role: 'Member' },
+      { name: 'Aryan Koju', role: 'Member' },
+      { name: 'Shreyan Wasti', role: 'Member' },
+      { name: 'Shreyash Mahato', role: 'Member' }
     ]
   
     return (

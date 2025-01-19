@@ -1,8 +1,8 @@
 const teamMembers = [
-    { name: 'John Doe', role: 'CEO' },
-    { name: 'Jane Smith', role: 'CTO' },
-    { name: 'Mike Johnson', role: 'Head of Operations' },
-    { name: 'Emily Brown', role: 'Customer Service Manager' },
+    { name: 'Sarbesh KC', role: 'Member' },
+    { name: 'Aryan Koju', role: 'Member' },
+    { name: 'Shreyan Wasti', role: 'Member' },
+    { name: 'Shreyash Mahato', role: 'Member' },
   ]
   
   export function OurTeam() {
