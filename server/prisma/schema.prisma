@@ -1,37 +1,118 @@
-generator client {
-  provider = "prisma-client-js"
-}
+// prisma/schema.prisma
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+generator client {
+  provider = "prisma-client-js"
 }
 
-model Restaurant {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  address     String
-  rating      Float    @default(0)
-  cuisine     String[]
-  openingHours Json
-  image       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-enum Role {
-  USER
-  ADMIN
+enum UserRole {
+  CUSTOMER
   RESTAURANT_OWNER
+  ADMIN
+}
+
+
+
+enum UserStatus {
+  PENDING    // For new restaurant accounts awaiting verification
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum Provider {
+  EMAIL
+  GOOGLE
+}
+
+model NotificationRecord {
+  id          String              @id @default(cuid())
+  userId      String
+  type        String
+  channel     String
+  content     Json
+  status      String
+  priority    String
+  sentAt      DateTime?
+  deliveredAt DateTime?
+  readAt      DateTime?
+  error       String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+ 
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+}
+model User {
+  id                    String      @id @default(cuid())
+  email                 String      @unique
+  password              String?     // Optional because Google users won't have passwords
+  name                  String
+  role                  UserRole    @default(CUSTOMER)
+  status                UserStatus  @default(ACTIVE)
+  provider              Provider    @default(EMAIL)
+  providerId            String?     // For storing Google's user ID
+  
+  // Email verification
+  emailVerified         Boolean     @default(false)
+  verificationToken     String?     @unique
+  verificationExpires   DateTime?
+  
+  // Password reset
+  resetToken           String?      @unique
+  resetTokenExpires    DateTime?
+  
+  // Restaurant verification (only used if role is RESTAURANT_OWNER)
+  restaurantDetails    RestaurantVerification?
+  
+  // Remember me functionality
+  refreshTokens        RefreshToken[]
+  
+  // Timestamps
+  lastLoginAt          DateTime?
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+}
+
+model RestaurantVerification {
+  id                  String    @id @default(cuid())
+  user                User      @relation(fields: [userId], references: [id])
+  userId              String    @unique
+  
+  // Business Details
+  businessName        String
+  businessAddress     String
+  businessPhone       String
+  businessEmail       String
+  description         String
+  cuisine            String[]
+  
+  // Verification Documents
+  businessLicense     String?   // URL to uploaded document
+  foodSafetyCert     String?   // URL to uploaded document
+  
+  // Verification Status
+  verificationStatus  String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  verificationNotes   String?   // Admin notes on verification
+  reviewedBy         String?    // Admin who reviewed the application
+  reviewedAt         DateTime?
+  
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model RefreshToken {
+  id          String    @id @default(cuid())
+  token       String    @unique
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  userAgent   String?   // Store browser/device info
+  ipAddress   String?
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
 }

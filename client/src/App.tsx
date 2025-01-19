@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// src/App.tsx
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { AuthProvider } from "@/contexts/AuthContext";
 import LoginPage from "@/pages/auth/LoginPage";
 import SignupPage from "@/pages/auth/SignupPage";
@@ -6,42 +7,47 @@ import MainLayout from "@/layouts/MainLayout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import HomePage from "@/pages/HomePage";
 
-// Configure future flags
-import { FUTURE_FLAGS } from "@/config/constants";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <MainLayout />,
-    children: [
-      {
-        index: true,
-        element: <ProtectedRoute><HomePage /></ProtectedRoute>,
-      }
-    ],
-  },
-  {
-    path: "/login",
-    element: <LoginPage />,
-  },
-  {
-    path: "/signup",
-    element: <SignupPage />,
-  },
-], {
-  future: {
-    v7_startTransition: true,
-    v7_relativeSplatPath: true,
-  },
-});
-
 function App() {
-  return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
-  );
+  // Create the router configuration
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: (
+        <AuthProvider>
+          <MainLayout />
+        </AuthProvider>
+      ),
+      children: [
+        {
+          index: true,
+          element: (
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          ),
+        }
+      ],
+    },
+    {
+      path: "/login",
+      element: (
+        <AuthProvider>
+          <LoginPage />
+        </AuthProvider>
+      ),
+    },
+    {
+      path: "/signup",
+      element: (
+        <AuthProvider>
+          <SignupPage />
+        </AuthProvider>
+      ),
+    },
+  ]);
+
+  // Return just the RouterProvider
+  return <RouterProvider router={router} />;
 }
 
 export default App;

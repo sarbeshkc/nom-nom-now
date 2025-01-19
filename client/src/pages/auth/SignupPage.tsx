@@ -1,7 +1,7 @@
+// src/pages/auth/SignupPage.tsx
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import AuthService from '@/services/auth.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function SignupPage() {
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { signup } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
@@ -49,11 +49,10 @@ export default function SignupPage() {
       const { confirmPassword, ...signupData } = formData;
       console.log('Data being sent to AuthService:', signupData); // Debug log
 
-      const response = await AuthService.signup(signupData);
+      const response = await signup(signupData);
       console.log('Response from server:', response); // Debug log
       
       if (response.success && response.data?.user) {
-        setUser(response.data.user);
         navigate('/'); // Redirect to home page
       } else {
         setError(response.error || 'Registration failed');
