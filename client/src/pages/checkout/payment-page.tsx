@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-//import { motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { CartItem, DeliveryDetailsType } from "./page"
 import { Banknote, CreditCard, Wallet } from 'lucide-react'
+import Image from 'next/image'
 
 interface PaymentPageProps {
   items: CartItem[]
@@ -45,14 +46,14 @@ const paymentOptions: PaymentOption[] = [
   {
     id: 'esewa',
     name: 'eSewa',
-    icon: <img src="/placeholder.svg?height=32&width=32&text=E" alt="eSewa" className="w-8 h-8" />,
+    icon: <Image src="/placeholder.svg?height=32&width=32&text=E" alt="eSewa" width={32} height={32} />,
     description: 'Pay using your eSewa wallet',
     color: '#10B981'
   },
   {
     id: 'khalti',
     name: 'Khalti',
-    icon: <img src="/placeholder.svg?height=32&width=32&text=K" alt="Khalti" className="w-8 h-8" />,
+    icon: <Image src="/placeholder.svg?height=32&width=32&text=K" alt="Khalti" width={32} height={32} />,
     description: 'Pay using your Khalti wallet',
     color: '#8B5CF6'
   }
@@ -201,3 +202,4 @@ export function PaymentPage({ items, deliveryDetails, deliveryFee, onSuccess, on
     </form>
   )
 }
+
