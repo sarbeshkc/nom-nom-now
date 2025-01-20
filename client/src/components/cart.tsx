@@ -14,7 +14,7 @@ interface CartProps {
 export function Cart({ onClose }: CartProps) {
   const { items, updateQuantity, removeItem, subtotal, total } = useCart()
   const deliveryFee = items.length > 0 ? 9.20 : 0
-  const taxes = subtotal * 0.15
+  //const taxes = subtotal * 0.15
   const navigate = useNavigate();
 
 
@@ -103,8 +103,8 @@ export function Cart({ onClose }: CartProps) {
               <span>₹{deliveryFee.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Taxes</span>
-              <span>₹{taxes.toFixed(2)}</span>
+              {/* <span className="text-gray-600">Taxes</span> */}
+              {/* <span>₹{taxes.toFixed(2)}</span> */}
             </div>
             <div className="flex justify-between font-medium text-base pt-2 border-t">
               <span>Total</span>
