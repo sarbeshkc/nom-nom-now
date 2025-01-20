@@ -1,7 +1,7 @@
 import { CheckCircle2, Package } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-
+//path = (/order-track)
 export function OrderConfirmation() {
   const handleNavigate = (path) => {
     // Handle navigation here based on your routing setup

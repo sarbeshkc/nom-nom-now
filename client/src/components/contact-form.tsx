@@ -33,7 +33,7 @@ export function ContactForm() {
         </div>
         <Button 
           type="submit" 
-          className="w-full bg-[#FF780B] hover:bg-[#ff6a33] text-white"
+          className="w-full bg-[#ff6a33] hover:bg-[#ff780b] text-white"
         >
           Send Message
         </Button>

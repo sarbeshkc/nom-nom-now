@@ -15,7 +15,7 @@ export function HeroSection() {
           <div className="flex flex-wrap gap-4">
             <Button 
               size="lg" 
-              className="bg-[#FF4D00] hover:bg-[#ff6a33] text-white px-8 py-6 text-lg rounded-md"
+              className="bg-[#ff6a33] hover:bg-[#FF8A0D] text-white px-8 py-6 text-lg rounded-md"
             >
               Order Now
             </Button>

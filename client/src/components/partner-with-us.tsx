@@ -16,7 +16,7 @@ export function PartnerWithUs() {
               delicious creations to a broader audience through our platform.
             </p>
             <Button 
-              className="bg-[#FF4D00] hover:bg-[#ff6a33] text-white px-8 py-6 text-lg h-auto"
+              className="bg-[#ff6a33] hover:bg-[#FF8A0D] text-white px-8 py-6 text-lg h-auto"
             >
               Join Now
             </Button>

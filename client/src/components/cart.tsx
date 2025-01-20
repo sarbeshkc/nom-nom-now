@@ -4,18 +4,22 @@ import { Minus, Plus, Lock, Trash2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 //import Image from 'next/image'
 import { useCart } from '../contexts/cart-context'
-
+import { useNavigate } from 'react-router-dom'
 interface CartProps {
   onClose: () => void;
 }
+
+
 
 export function Cart({ onClose }: CartProps) {
   const { items, updateQuantity, removeItem, subtotal, total } = useCart()
   const deliveryFee = items.length > 0 ? 9.20 : 0
   const taxes = subtotal * 0.15
+  const navigate = useNavigate();
+
 
   return (
-    <div className="h-screen flex flex-col bg-white border-l">
+    <div className="pt-16 h-screen flex flex-col bg-white border-l">
       <div className="p-6 border-b flex justify-between items-center">
         <h2 className="text-xl font-semibold">My Order</h2>
         {items.length === 0 && (
@@ -107,7 +111,10 @@ export function Cart({ onClose }: CartProps) {
               <span>₹{total.toFixed(2)}</span>
             </div>
           </div>
-          <Button className="w-full bg-[#FF4500] hover:bg-[#FF4500]/90 h-12">
+          <Button className="w-full bg-[#FF4500] hover:bg-[#FF4500]/90 h-12"
+      onClick={() => navigate('/checkout')}
+
+>
             Order and checkout
           </Button>
         </div>

@@ -257,11 +257,12 @@ function MenuPageContent() {
       <div className={cartVisible ? "w-[70%]" : "w-full"}> 
         {/* <Header /> */}
         
-        <main className="flex-1 overflow-y-auto">
+        {/* <main className="flex-1 overflow-y-auto"> */}
+        <main className="pt-16">
           {/* Hero Section */}
-          <div className="bg-[#FF4500] py-16 px-12">
+          <div className="pt-16 bg-[#FF8A0D] py-16 px-12">
             <div className="max-w-xl">
-              <h1 className="text-4xl font-bold text-white mb-4">
+              <h1 className="text-4xl font-bold text-white mb-1">
                 You have a bad meal.
                 <br />
                 Just eat good food
@@ -299,7 +300,7 @@ function MenuPageContent() {
               <h2 className="text-2xl font-bold">Our Regular Menu Pack</h2>
               <Button
                 variant="ghost"
-                className="text-[#FF4500] hover:text-[#FF4500]/90"
+                className="text-[#FF8A0D] hover:text-[#FF8A0D]/90"
                 onClick={() => setShowAllItems(!showAllItems)}
               >
                 {showAllItems ? 'Show Less' : 'View All'}
@@ -342,11 +343,11 @@ function MenuPageContent() {
                   <h3 className="font-medium mb-1">{item.name}</h3>
                   <p className="text-sm text-gray-500 mb-2">{item.category}</p>
                   <div className="flex items-center justify-between">
-                    <span className="text-[#FF4500] font-medium">₹{item.price.toFixed(2)}</span>
+                    <span className="text-[#58B55F] font-medium">₹{item.price.toFixed(2)}</span>
                     <span className="text-gray-500 text-sm">{item.distance.toFixed(1)} km</span>
                   </div>
                   <Button 
-                    className="w-full mt-4 bg-[#FF4500] hover:bg-[#FF4500]/90"
+                    className="w-full mt-4 bg-[#FF8A0D] hover:bg-[#ff6a33]"
                     onClick={() => handleAddToCart(item)}
                   >
                     Add To Cart
@@ -380,7 +381,7 @@ function MenuPageContent() {
                       /> */}
                     </div>
                     <p className="text-gray-600 mb-4">{restaurant.description}</p>
-                    <Button className="w-full bg-[#FF4500] hover:bg-[#FF4500]/90">
+                    <Button className="w-full bg-[#FF8A0D] hover:bg-[#FF4500]/90">
                       Order Now
                     </Button>
                   </div>

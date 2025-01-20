@@ -22,7 +22,7 @@ export function DeliveringHappiness() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="relative">
             <div className="aspect-[4/3] bg-gray-200 rounded-lg mb-8" />
-            <div className="bg-[#FF4D00] rounded-lg p-8 text-white">
+            <div className="bg-[#ff6a33] rounded-lg p-8 text-white">
               <h3 className="text-2xl font-semibold mb-6">Come and visit us</h3>
               <div className="space-y-4">
                 {contactInfo.map((info) => (
@@ -43,7 +43,7 @@ export function DeliveringHappiness() {
             <p className="text-gray-600 mb-8">
               Planning a special dining experience? With our simple reservation feature, securing your table is effortless and convenient. At Nom Nom Now, food is more than a meal—it's an experience to cherish. Redefine dining and delivery with us, one craving at a time.
             </p>
-            <Button className="bg-[#FF4D00] hover:bg-[#ff6a33] text-white px-8">
+            <Button className="bg-[#ff6a33] hover:bg-[#FF8A0D] text-white px-8">
               More About Us
             </Button>
           </div>

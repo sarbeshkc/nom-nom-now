@@ -104,7 +104,7 @@ export function ReservationForm() {
           </div>
           <Button 
             type="submit" 
-            className="w-full bg-[#FF780B] hover:bg-[#ff6a33] text-white py-6 text-lg h-auto"
+            className="w-full bg-[#ff6a33] hover:bg-[#ff780b] text-white py-6 text-lg h-auto"
           >
             Reserve Now
           </Button>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-//import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Minus, Plus, ShoppingBag } from 'lucide-react'
@@ -10,7 +10,9 @@ import { CartItem } from "./page"
 
 interface CartPageProps {
   items: CartItem[]
-  onNext: () => void
+  onNext: () => {
+    
+  }
 }
 
 export function CartPage({ items, onNext }: CartPageProps) {
@@ -45,16 +47,16 @@ export function CartPage({ items, onNext }: CartPageProps) {
               transition={{ duration: 0.5 }}
               className="absolute inset-0"
             >
-              {/* <Image
+              {/* <img
                 src={items[currentImageIndex].image || "/placeholder.svg"}
                 alt={items[currentImageIndex].name}
-                fill
+                //fill
                 className="object-cover"
               /> */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6">
-                <h3 className="text-2xl font-semibold text-white">{items[currentImageIndex].name}</h3>
-                <p className="text-lg text-white/90 mt-2">{items[currentImageIndex].description}</p>
+                {/* <h3 className="text-2xl font-semibold text-white">{items[currentImageIndex].name}</h3> */}
+                {/* <p className="text-lg text-white/90 mt-2">{items[currentImageIndex].description}</p> */}
               </div>
             </motion.div>
           </AnimatePresence>
@@ -81,10 +83,10 @@ export function CartPage({ items, onNext }: CartPageProps) {
               className="flex items-center space-x-4 p-4 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-gray-100">
-                {/* <Image
+                {/* <img
                   src={item.image || "/placeholder.svg"}
                   alt={item.name}
-                  fill
+                  //fill
                   className="object-cover"
                 /> */}
               </div>

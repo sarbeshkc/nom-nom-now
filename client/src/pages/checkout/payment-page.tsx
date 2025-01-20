@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { CartItem, DeliveryDetailsType } from "./page"
 import { Banknote, CreditCard, Wallet } from 'lucide-react'
-import Image from 'next/image'
+//import Image from 'next/image'
 
 interface PaymentPageProps {
   items: CartItem[]
@@ -46,14 +46,14 @@ const paymentOptions: PaymentOption[] = [
   {
     id: 'esewa',
     name: 'eSewa',
-    icon: <Image src="/placeholder.svg?height=32&width=32&text=E" alt="eSewa" width={32} height={32} />,
+    icon: <img src="/placeholder.svg?height=32&width=32&text=E" alt="eSewa" width={32} height={32} />,
     description: 'Pay using your eSewa wallet',
     color: '#10B981'
   },
   {
     id: 'khalti',
     name: 'Khalti',
-    icon: <Image src="/placeholder.svg?height=32&width=32&text=K" alt="Khalti" width={32} height={32} />,
+    icon: <img src="/placeholder.svg?height=32&width=32&text=K" alt="Khalti" width={32} height={32} />,
     description: 'Pay using your Khalti wallet',
     color: '#8B5CF6'
   }
@@ -97,7 +97,7 @@ export function PaymentPage({ items, deliveryDetails, deliveryFee, onSuccess, on
               style={{
                 backgroundColor: `${option.color}10`,
                 borderColor: option.color,
-                ringColor: option.color
+                //ringColor: option.color
               }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}

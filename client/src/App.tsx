@@ -10,7 +10,7 @@ import ReservationPage from "@/pages/reservation/page";
 import OrderPage from "@/pages/order/page";
 import MenuPage from "@/pages/menu/page";
 import Home from "./pages/page";
-
+import { CartPage } from "./pages/checkout/cart-page";
 // Define the routes using createBrowserRouter
 const router = createBrowserRouter(
   [
@@ -26,11 +26,15 @@ const router = createBrowserRouter(
             </ProtectedRoute>
           ),
         },
+        {path: "checkout", element: <CartPage items={[]} onNext={function (): void {
+          throw new Error("Function not implemented.");
+        } }/>},
         { path: "home", element: <Home />},
         { path: "menu", element: <MenuPage /> },
         { path: "order", element: <OrderPage /> },
         { path: "reservation", element: <ReservationPage /> },
         { path: "contact", element: <ContactPage /> },
+
       ],
     },
     {

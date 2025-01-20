@@ -22,7 +22,7 @@ export function Header() {
           <Button variant="ghost" className="text-gray-800" onClick={() =>navigate('/login')}>
             Sign In
           </Button>
-          <Button className="bg-[#FF780B] hover:bg-[#ff6a33] text-white">
+          <Button className="bg-[#ff6a33] hover:bg-[#FF8A0D] text-white">
             Order Now
           </Button>
         </div>

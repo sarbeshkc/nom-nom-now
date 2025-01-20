@@ -8,7 +8,6 @@ import { OrderSummary } from './order-summary'
 import { PaymentPage } from './payment-page'
 import { OrderConfirmation } from './order-confirmation'
 import { Card } from '@/components/ui/card'
-//import { SiteHeader } from '../components/site-header'
 import { ShoppingCart, Navigation, Receipt, CreditCard, Check } from 'lucide-react'
 
 type CheckoutStep = 'cart' | 'delivery' | 'summary' | 'payment' | 'confirmation'
@@ -53,7 +52,7 @@ export default function CheckoutPage() {
     phone: '',
     deliveryPhone: ''
   })
-  
+
   const [cartItems] = useState<CartItem[]>([
     {
       id: '1',
@@ -87,12 +86,11 @@ export default function CheckoutPage() {
     { id: 'delivery', label: 'Delivery', icon: Navigation },
     { id: 'summary', label: 'Summary', icon: Receipt },
     { id: 'payment', label: 'Payment', icon: CreditCard },
+    { id: 'confirmation', label: 'Confirmation', icon: Check }
   ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      {/* <SiteHeader /> */}
-      
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-[300px,1fr] gap-8">
@@ -106,16 +104,14 @@ export default function CheckoutPage() {
                 return (
                   <div
                     key={s.id}
-                    className={`
-                      relative rounded-lg p-4 transition-all duration-200
-                      ${isActive ? 'bg-[#FF780B] text-white shadow-lg' : 
+                    className={`relative rounded-lg p-4 transition-all duration-200
+                      ${isActive ? 'bg-[#FF780B] text-white shadow-lg' :
                         isCompleted ? 'bg-orange-50 text-[#FF780B]' : 'bg-white text-gray-500'}
                     `}
                   >
                     <div className="flex items-center space-x-3">
-                      <div className={`
-                        p-2 rounded-full
-                        ${isActive ? 'bg-white/20' : 
+                      <div className={`p-2 rounded-full
+                        ${isActive ? 'bg-white/20' :
                           isCompleted ? 'bg-[#FF780B]/10' : 'bg-gray-100'}
                       `}>
                         {isCompleted ? (
@@ -149,15 +145,16 @@ export default function CheckoutPage() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
+                  className="w-full h-full"
                 >
                   {step === 'cart' && (
-                    <CartPage 
-                      items={cartItems} 
-                      onNext={() => handleNext('delivery')} 
+                    <CartPage
+                      items={cartItems}
+                      onNext={() => handleNext('delivery')}
                     />
                   )}
                   {step === 'delivery' && (
-                    <DeliveryDetails 
+                    <DeliveryDetails
                       onSubmit={handleDeliverySubmit}
                     />
                   )}
@@ -191,4 +188,3 @@ export default function CheckoutPage() {
     </div>
   )
 }
-
