@@ -1,190 +1,82 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { CartPage } from './cart-page'
-import { DeliveryDetails } from './delivery-details'
-import { OrderSummary } from './order-summary'
-import { PaymentPage } from './payment-page'
-import { OrderConfirmation } from './order-confirmation'
-import { Card } from '@/components/ui/card'
-import { ShoppingCart, Navigation, Receipt, CreditCard, Check } from 'lucide-react'
+import { useState } from "react"
+import { Header } from "@/components/header"
+import { Footer } from "@/components/Footer"
+import { CartStep } from "@/components/checkout/cart-step"
+import { DeliveryStep } from "@/components/checkout/delivery-step"
+import { SummaryStep } from "@/components/checkout/summary-step"
+import { PaymentStep } from "@/components/checkout/payment-step"
+import { ConfirmationStep } from "@/components/checkout/confirmation-step"
 
-type CheckoutStep = 'cart' | 'delivery' | 'summary' | 'payment' | 'confirmation'
-
-export type DeliveryMethod = 'delivery' | 'pickup'
-export type PickupType = 'designated' | 'restaurant'
-
-export interface DeliveryDetailsType {
-  method: DeliveryMethod
-  pickupType?: PickupType
-  province: string
-  district: string
-  municipality: string
-  wardNo: string
-  tole: string
-  landmark: string
-  phone: string
-  deliveryPhone?: string
-}
-
-export interface CartItem {
-  id: string
-  name: string
-  description: string
-  price: number
-  quantity: number
-  image: string
-}
-
-const DELIVERY_FEE = 100 // NPR
+type CheckoutStep = "cart" | "delivery" | "summary" | "payment" | "confirmation"
 
 export default function CheckoutPage() {
-  const [step, setStep] = useState<CheckoutStep>('cart')
-  const [deliveryDetails, setDeliveryDetails] = useState<DeliveryDetailsType>({
-    method: 'delivery',
-    province: '',
-    district: '',
-    municipality: '',
-    wardNo: '',
-    tole: '',
-    landmark: '',
-    phone: '',
-    deliveryPhone: ''
+  const [currentStep, setCurrentStep] = useState<CheckoutStep>("cart")
+  const [deliveryDetails, setDeliveryDetails] = useState({
+    type: "delivery",
+    province: "",
+    district: "",
+    municipality: "",
+    ward: "",
+    street: "",
+    landmark: "",
+    phone: "",
+    alternativePhone: "",
   })
 
-  const [cartItems] = useState<CartItem[]>([
-    {
-      id: '1',
-      name: 'Chicken Momo',
-      description: 'Steamed dumplings with special sauce',
-      price: 180,
-      quantity: 1,
-      image: '/placeholder.svg?height=80&width=80&text=🥟'
-    },
-    {
-      id: '2',
-      name: 'Chow Mein',
-      description: 'Nepali style noodles with vegetables',
-      price: 160,
-      quantity: 2,
-      image: '/placeholder.svg?height=80&width=80&text=🍜'
-    }
-  ])
-
-  const handleNext = (nextStep: CheckoutStep) => {
-    setStep(nextStep)
+  const steps = {
+    cart: <CartStep onNext={() => setCurrentStep("delivery")} />,
+    delivery: (
+      <DeliveryStep
+        deliveryDetails={deliveryDetails}
+        setDeliveryDetails={setDeliveryDetails}
+        onBack={() => setCurrentStep("cart")}
+        onNext={() => setCurrentStep("summary")}
+      />
+    ),
+    summary: (
+      <SummaryStep
+        deliveryDetails={deliveryDetails}
+        onBack={() => setCurrentStep("delivery")}
+        onNext={() => setCurrentStep("payment")}
+      />
+    ),
+    payment: <PaymentStep onBack={() => setCurrentStep("summary")} onNext={() => setCurrentStep("confirmation")} />,
+    confirmation: <ConfirmationStep />,
   }
-
-  const handleDeliverySubmit = (details: DeliveryDetailsType) => {
-    setDeliveryDetails(details)
-    setStep('summary')
-  }
-
-  const steps = [
-    { id: 'cart', label: 'Cart', icon: ShoppingCart },
-    { id: 'delivery', label: 'Delivery', icon: Navigation },
-    { id: 'summary', label: 'Summary', icon: Receipt },
-    { id: 'payment', label: 'Payment', icon: CreditCard },
-    { id: 'confirmation', label: 'Confirmation', icon: Check }
-  ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-[300px,1fr] gap-8">
-            {/* Left Sidebar - Steps */}
-            <div className="space-y-4">
-              {steps.map((s, index) => {
-                const isActive = s.id === step
-                const isCompleted = steps.findIndex(x => x.id === step) > index
-                const Icon = s.icon
-
-                return (
+    <>
+      <Header />
+      <main className="min-h-screen pt-24 pb-16">
+        <div className="container mx-auto px-6">
+          <div className="flex gap-8">
+            <div className="w-64 shrink-0">
+              <nav className="space-y-1">
+                {[
+                  { id: "cart", label: "Cart" },
+                  { id: "delivery", label: "Delivery" },
+                  { id: "summary", label: "Summary" },
+                  { id: "payment", label: "Payment" },
+                ].map((step) => (
                   <div
-                    key={s.id}
-                    className={`relative rounded-lg p-4 transition-all duration-200
-                      ${isActive ? 'bg-[#FF780B] text-white shadow-lg' :
-                        isCompleted ? 'bg-orange-50 text-[#FF780B]' : 'bg-white text-gray-500'}
-                    `}
+                    key={step.id}
+                    className={`p-4 rounded-lg ${
+                      currentStep === step.id ? "bg-[#FF4D00] text-white" : "text-gray-600"
+                    }`}
                   >
-                    <div className="flex items-center space-x-3">
-                      <div className={`p-2 rounded-full
-                        ${isActive ? 'bg-white/20' :
-                          isCompleted ? 'bg-[#FF780B]/10' : 'bg-gray-100'}
-                      `}>
-                        {isCompleted ? (
-                          <Check className="h-5 w-5" />
-                        ) : (
-                          <Icon className="h-5 w-5" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="font-medium">{s.label}</div>
-                        {isActive && (
-                          <div className="text-sm text-white/80">Current step</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {index < steps.length - 1 && (
-                      <div className="absolute left-7 top-[calc(100%-8px)] h-8 w-px bg-gray-200" />
-                    )}
+                    {step.label}
                   </div>
-                )
-              })}
+                ))}
+              </nav>
             </div>
-
-            {/* Right Content */}
-            <Card className="shadow-lg overflow-hidden">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={step}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="w-full h-full"
-                >
-                  {step === 'cart' && (
-                    <CartPage
-                      items={cartItems}
-                      onNext={() => handleNext('delivery')}
-                    />
-                  )}
-                  {step === 'delivery' && (
-                    <DeliveryDetails
-                      onSubmit={handleDeliverySubmit}
-                    />
-                  )}
-                  {step === 'summary' && (
-                    <OrderSummary
-                      items={cartItems}
-                      deliveryDetails={deliveryDetails}
-                      deliveryFee={DELIVERY_FEE}
-                      onNext={() => handleNext('payment')}
-                      onBack={() => handleNext('delivery')}
-                    />
-                  )}
-                  {step === 'payment' && (
-                    <PaymentPage
-                      items={cartItems}
-                      deliveryDetails={deliveryDetails}
-                      deliveryFee={DELIVERY_FEE}
-                      onSuccess={() => handleNext('confirmation')}
-                      onBack={() => handleNext('summary')}
-                    />
-                  )}
-                  {step === 'confirmation' && (
-                    <OrderConfirmation />
-                  )}
-                </motion.div>
-              </AnimatePresence>
-            </Card>
+            <div className="flex-1">{steps[currentStep]}</div>
           </div>
         </div>
-      </div>
-    </div>
+      </main>
+      <Footer />
+    </>
   )
 }
+
