@@ -1,8 +1,13 @@
+// src/services/email.service.ts
+
 import nodemailer, { Transporter } from 'nodemailer';
-import { PrismaClient } from '@prisma/client';
-import handlebars from 'handlebars';
-import path from 'path';
 import fs from 'fs/promises';
+import path from 'path';
+import handlebars from 'handlebars';
+import { PrismaClient } from '@prisma/client';
+import { LoggingMiddleware } from '../middleware/logging.middleware';
+
+// Import necessary types
 import { 
   NotificationChannel, 
   NotificationPriority,
@@ -10,15 +15,17 @@ import {
   SecurityLog,
   LoginNotification,
   DeviceInfo,
-  Session }
-  from '@/types/auth.type
+  Session 
+} from '../types/auth.type';
 
+// Define email template interface
 interface EmailTemplate {
   name: string;
   subject: string;
   template: HandlebarsTemplateDelegate;
 }
 
+// Define email options interface
 interface EmailOptions {
   to: string;
   subject: string;
@@ -26,14 +33,19 @@ interface EmailOptions {
   priority?: 'high' | 'normal' | 'low';
 }
 
-export class EmailService {
+class EmailService {
   private transporter: Transporter;
   private prisma: PrismaClient;
   private templates: Map<string, EmailTemplate>;
+  private readonly DEFAULT_FROM_NAME: string;
+  private readonly DEFAULT_FROM_EMAIL: string;
 
   constructor() {
+    // Initialize dependencies
     this.prisma = new PrismaClient();
     this.templates = new Map();
+    this.DEFAULT_FROM_NAME = process.env.EMAIL_FROM_NAME || 'Nom Nom Now';
+    this.DEFAULT_FROM_EMAIL = process.env.EMAIL_FROM_ADDRESS || 'noreply@nomnow.com';
 
     // Initialize nodemailer transporter
     this.transporter = nodemailer.createTransport({
@@ -46,21 +58,38 @@ export class EmailService {
       }
     });
 
-    // Load templates
-    this.loadTemplates().catch(console.error);
+    // Load email templates
+    this.loadTemplates().catch(error => {
+      console.error('Failed to load email templates:', error);
+      throw error;
+    });
   }
 
+  /**
+   * Load and compile email templates
+   * Templates are loaded once and cached for future use
+   */
   private async loadTemplates(): Promise<void> {
     try {
+      // Get path to email templates directory
       const templatesDir = path.join(__dirname, '../templates/email');
+      
+      // Load main layout template first
+      const layoutPath = path.join(templatesDir, 'layouts/main.hbs');
+      const layoutContent = await fs.readFile(layoutPath, 'utf-8');
+      handlebars.registerPartial('layout', layoutContent);
+
+      // Read all template files
       const templates = await fs.readdir(templatesDir);
 
+      // Load and compile each template
       for (const file of templates) {
-        if (file.endsWith('.hbs')) {
+        if (file.endsWith('.hbs') && !file.includes('layout')) {
           const templateName = file.replace('.hbs', '');
           const templatePath = path.join(templatesDir, file);
           const templateContent = await fs.readFile(templatePath, 'utf-8');
 
+          // Register template with layout
           this.templates.set(templateName, {
             name: templateName,
             subject: this.getDefaultSubject(templateName),
@@ -68,12 +97,17 @@ export class EmailService {
           });
         }
       }
+
+      console.log(`Loaded ${this.templates.size} email templates successfully`);
     } catch (error) {
-      console.error('Failed to load email templates:', error);
+      console.error('Error loading email templates:', error);
       throw error;
     }
   }
 
+  /**
+   * Get default subject line for different email types
+   */
   private getDefaultSubject(templateName: string): string {
     const subjects: Record<string, string> = {
       'verification': 'Verify Your Email Address',
@@ -87,6 +121,9 @@ export class EmailService {
     return subjects[templateName] || 'Notification from Nom Nom Now';
   }
 
+  /**
+   * Send an email using a template
+   */
   private async sendEmail(
     userId: string,
     to: string,
@@ -96,15 +133,23 @@ export class EmailService {
   ): Promise<void> {
     const template = this.templates.get(templateName);
     if (!template) {
-      throw new Error(`Template ${templateName} not found`);
+      throw new Error(`Email template '${templateName}' not found`);
     }
 
-    const html = template.template({
+    // Add common template variables
+    const fullContext = {
       ...context,
       supportEmail: process.env.SUPPORT_EMAIL,
-      year: new Date().getFullYear()
-    });
+      supportPhone: process.env.SUPPORT_PHONE,
+      logoUrl: process.env.LOGO_URL,
+      currentYear: new Date().getFullYear(),
+      appName: 'Nom Nom Now'
+    };
 
+    // Render email template
+    const html = template.template(fullContext);
+
+    // Prepare email options
     const mailOptions: EmailOptions = {
       to,
       subject: template.subject,
@@ -113,27 +158,49 @@ export class EmailService {
     };
 
     try {
+      // Send email
       await this.transporter.sendMail({
         ...mailOptions,
-        from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_FROM_ADDRESS}>`
+        from: `"${this.DEFAULT_FROM_NAME}" <${this.DEFAULT_FROM_EMAIL}>`
       });
 
-      await this.createNotificationRecord(userId, templateName, 'EMAIL', {
-        subject: template.subject,
-        body: html,
-        data: context
-      }, 'SENT', priority);
+      // Log successful email send
+      await this.createNotificationRecord(
+        userId,
+        templateName,
+        'EMAIL',
+        {
+          subject: template.subject,
+          body: html,
+          data: context
+        },
+        'SENT',
+        priority
+      );
 
     } catch (error) {
-      await this.createNotificationRecord(userId, templateName, 'EMAIL', {
-        subject: template.subject,
-        body: html,
-        data: { error: (error as Error).message }
-      }, 'FAILED', priority);
+      // Log failed email attempt
+      await this.createNotificationRecord(
+        userId,
+        templateName,
+        'EMAIL',
+        {
+          subject: template.subject,
+          body: html,
+          data: { error: (error as Error).message }
+        },
+        'FAILED',
+        priority
+      );
+
+      // Re-throw error for handling upstream
       throw error;
     }
   }
 
+  /**
+   * Create notification record in database
+   */
   private async createNotificationRecord(
     userId: string,
     type: string,
@@ -155,6 +222,9 @@ export class EmailService {
     });
   }
 
+  /**
+   * Map priority levels to email priority
+   */
   private mapPriority(priority: NotificationPriority): 'high' | 'normal' | 'low' {
     switch (priority) {
       case 'URGENT':
@@ -167,7 +237,11 @@ export class EmailService {
     }
   }
 
-  // Public methods
+  /**
+   * Public methods for sending specific types of emails
+   */
+
+  // Send email verification
   async sendVerification(
     userId: string,
     email: string,
@@ -184,6 +258,7 @@ export class EmailService {
     );
   }
 
+  // Send password reset email
   async sendPasswordResetEmail(
     userId: string,
     email: string,
@@ -200,6 +275,7 @@ export class EmailService {
     );
   }
 
+  // Send security alert
   async sendSecurityAlert(
     userId: string,
     email: string,
@@ -217,7 +293,8 @@ export class EmailService {
       deviceInfo: details.deviceInfo,
       location: details.location,
       timestamp: details.timestamp.toLocaleString(),
-      securitySettingsLink: `${process.env.CLIENT_URL}/settings/security`
+      securitySettingsUrl: `${process.env.CLIENT_URL}/settings/security`,
+      isNewLogin: alertType === 'NEW_LOGIN'
     };
 
     await this.sendEmail(
@@ -229,29 +306,30 @@ export class EmailService {
     );
   }
 
-  async sendRestaurantVerificationStatus(
+  // Send welcome email
+  async sendWelcomeEmail(
     userId: string,
     email: string,
     name: string,
-    status: 'APPROVED' | 'REJECTED',
-    notes?: string
+    isRestaurantOwner: boolean = false
   ): Promise<void> {
-    const context = {
-      name,
-      status,
-      notes,
-      loginLink: `${process.env.CLIENT_URL}/login`
-    };
-
     await this.sendEmail(
       userId,
       email,
-      'restaurant-verification',
-      context,
-      'HIGH'
+      'welcome',
+      {
+        name,
+        isRestaurantOwner,
+        dashboardUrl: `${process.env.CLIENT_URL}/dashboard`,
+        helpUrl: `${process.env.CLIENT_URL}/help`,
+        appStoreUrl: process.env.APP_STORE_URL,
+        playStoreUrl: process.env.PLAY_STORE_URL
+      },
+      'MEDIUM'
     );
   }
 
+  // Send 2FA setup email with backup codes
   async sendTwoFactorEnabled(
     userId: string,
     email: string,
@@ -261,25 +339,28 @@ export class EmailService {
     await this.sendEmail(
       userId,
       email,
-      'two-factor-enabled',
-      { name, backupCodes },
+      'two-factor',
+      {
+        name,
+        backupCodes,
+        isSetup: true,
+        securitySettingsUrl: `${process.env.CLIENT_URL}/settings/security`
+      },
       'HIGH'
     );
   }
 
-  async sendWelcomeEmail(
-    userId: string,
-    email: string,
-    name: string
-  ): Promise<void> {
-    await this.sendEmail(
-      userId,
-      email,
-      'welcome',
-      { name },
-      'MEDIUM'
-    );
+  // Test email connection
+  async testConnection(): Promise<boolean> {
+    try {
+      await this.transporter.verify();
+      return true;
+    } catch (error) {
+      console.error('Email service connection test failed:', error);
+      return false;
+    }
   }
 }
 
+// Export singleton instance
 export const emailService = new EmailService();

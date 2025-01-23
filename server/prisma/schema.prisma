@@ -1,118 +1,335 @@
-// prisma/schema.prisma
+// This is your Prisma schema file for Nom Nom Now
+// Learn more about Prisma schemas: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
+// Enum definitions for various status and types
 enum UserRole {
   CUSTOMER
   RESTAURANT_OWNER
   ADMIN
 }
 
-
-
 enum UserStatus {
-  PENDING    // For new restaurant accounts awaiting verification
   ACTIVE
+  INACTIVE
   SUSPENDED
-  BANNED
+  PENDING_VERIFICATION
 }
 
-enum Provider {
-  EMAIL
-  GOOGLE
+enum RestaurantStatus {
+  ACTIVE
+  INACTIVE
+  PENDING_VERIFICATION
+  SUSPENDED
 }
 
-model NotificationRecord {
-  id          String              @id @default(cuid())
-  userId      String
-  type        String
-  channel     String
-  content     Json
-  status      String
-  priority    String
-  sentAt      DateTime?
-  deliveredAt DateTime?
-  readAt      DateTime?
-  error       String?
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
- 
-  @@index([userId])
-  @@index([type])
-  @@index([status])
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY_FOR_PICKUP
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
 }
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CASH
+  KHALTI
+  ESEWA
+  BANK_TRANSFER
+}
+
+// User model representing customers, restaurant owners, and admins
 model User {
-  id                    String      @id @default(cuid())
-  email                 String      @unique
-  password              String?     // Optional because Google users won't have passwords
-  name                  String
-  role                  UserRole    @default(CUSTOMER)
-  status                UserStatus  @default(ACTIVE)
-  provider              Provider    @default(EMAIL)
-  providerId            String?     // For storing Google's user ID
-  
-  // Email verification
-  emailVerified         Boolean     @default(false)
-  verificationToken     String?     @unique
-  verificationExpires   DateTime?
-  
-  // Password reset
-  resetToken           String?      @unique
-  resetTokenExpires    DateTime?
-  
-  // Restaurant verification (only used if role is RESTAURANT_OWNER)
-  restaurantDetails    RestaurantVerification?
-  
-  // Remember me functionality
-  refreshTokens        RefreshToken[]
-  
+  id                      String         @id @default(cuid())
+  email                   String         @unique
+  password                String?        // Nullable for social login
+  name                    String
+  role                    UserRole       @default(CUSTOMER)
+  status                  UserStatus     @default(PENDING_VERIFICATION)
+  emailVerified           Boolean        @default(false)
+  phoneNumber             String?
+  phoneVerified           Boolean        @default(false)
+  avatar                  String?
+  dateOfBirth            DateTime?
+  addresses              Address[]
+  // Auth and security
+  verificationToken       String?        @unique
+  verificationExpires     DateTime?
+  resetToken             String?        @unique
+  resetTokenExpires      DateTime?
+  twoFactorSecret        String?
+  twoFactorEnabled       Boolean        @default(false)
+  lastLoginAt            DateTime?
+  lastLoginIp            String?
+  // Relationships
+  restaurant             Restaurant?    // For restaurant owners
+  orders                 Order[]        // Customer orders
+  reviews                Review[]
+  paymentMethods         PaymentMethod[]
   // Timestamps
-  lastLoginAt          DateTime?
-  createdAt            DateTime    @default(now())
-  updatedAt            DateTime    @updatedAt
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+  deletedAt              DateTime?      // Soft delete
+
+  @@index([email])
+  @@index([phoneNumber])
 }
 
-model RestaurantVerification {
-  id                  String    @id @default(cuid())
-  user                User      @relation(fields: [userId], references: [id])
-  userId              String    @unique
-  
-  // Business Details
-  businessName        String
-  businessAddress     String
-  businessPhone       String
-  businessEmail       String
-  description         String
-  cuisine            String[]
-  
-  // Verification Documents
-  businessLicense     String?   // URL to uploaded document
-  foodSafetyCert     String?   // URL to uploaded document
-  
-  // Verification Status
-  verificationStatus  String    @default("PENDING") // PENDING, APPROVED, REJECTED
-  verificationNotes   String?   // Admin notes on verification
-  reviewedBy         String?    // Admin who reviewed the application
-  reviewedAt         DateTime?
-  
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+// Restaurant model
+model Restaurant {
+  id                    String            @id @default(cuid())
+  name                  String
+  slug                  String            @unique
+  description           String?           @db.Text
+  ownerId              String            @unique
+  owner                User              @relation(fields: [ownerId], references: [id])
+  status               RestaurantStatus  @default(PENDING_VERIFICATION)
+  cuisineTypes         String[]          // Array of cuisine types
+  priceRange           String            // e.g., "$", "$$", "$$$"
+  // Contact and location
+  email                String
+  phoneNumber          String
+  address             Address?          @relation(fields: [addressId], references: [id])
+  addressId           String?           @unique  // Make this optional
+
+
+  latitude             Float?
+  longitude            Float?
+  // Business details
+  openingHours         Json              // Store as structured JSON
+  minimumOrder         Float             @default(0)
+  deliveryRadius       Float?            // In kilometers
+  estimatedDeliveryTime String?          // e.g., "30-45 minutes"
+  // Features
+  isVeg                Boolean           @default(false)
+  hasDelivery          Boolean           @default(true)
+  hasTakeaway         Boolean           @default(true)
+  // Relationships
+  menu                 MenuItem[]
+  orders               Order[]
+  reviews              Review[]
+  // Metrics
+  rating               Float             @default(0)
+  totalRatings         Int               @default(0)
+  totalOrders          Int               @default(0)
+  // Media
+  photos               String[]          // Array of photo URLs
+  coverImage           String?
+  logo                 String?
+  // Documents
+  businessLicense      String?
+  foodSafetyCert      String?
+  // Timestamps
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  deletedAt            DateTime?         // Soft delete
+
+  @@index([status])
+  @@index([cuisineTypes])
+  @@index([rating])
 }
 
-model RefreshToken {
-  id          String    @id @default(cuid())
-  token       String    @unique
-  user        User      @relation(fields: [userId], references: [id])
-  userId      String
-  userAgent   String?   // Store browser/device info
-  ipAddress   String?
-  expiresAt   DateTime
-  createdAt   DateTime  @default(now())
+// Menu Item model
+model MenuItem {
+  id              String      @id @default(cuid())
+  restaurantId    String
+  restaurant      Restaurant  @relation(fields: [restaurantId], references: [id])
+  name            String
+  description     String?     @db.Text
+  price           Float
+  category        String      // e.g., "Starters", "Main Course"
+  imageUrl        String?
+  // Dietary info
+  isVeg           Boolean     @default(false)
+  isSpicy         Boolean     @default(false)
+  allergens       String[]    // Array of allergen types
+  // Customization
+  customizationOptions Json?  // Store customization options as JSON
+  // Status
+  isAvailable     Boolean     @default(true)
+  // Relationships
+  orderItems      OrderItem[]
+  // Timestamps
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  deletedAt       DateTime?   // Soft delete
+
+  @@index([restaurantId])
+  @@index([category])
+  @@index([isAvailable])
+}
+
+// Order model
+model Order {
+  id                String        @id @default(cuid())
+  userId            String
+  user              User          @relation(fields: [userId], references: [id])
+  restaurantId      String
+  restaurant        Restaurant    @relation(fields: [restaurantId], references: [id])
+  status            OrderStatus   @default(PENDING)
+  // Items and pricing
+  items             OrderItem[]
+  subtotal          Float
+  deliveryFee       Float
+  tax               Float
+  total             Float
+  // Delivery info
+  deliveryAddressId String
+  deliveryAddress   Address       @relation(fields: [deliveryAddressId], references: [id])
+  deliveryNotes     String?
+  // Payment
+  payment           Payment?
+  // Tracking
+  confirmedAt       DateTime?
+  preparedAt        DateTime?
+  pickedUpAt        DateTime?
+  deliveredAt       DateTime?
+  cancelledAt       DateTime?
+  cancellationReason String?
+  // Review
+  review            Review?
+  // Timestamps
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([restaurantId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Order Item model - represents items in an order
+model OrderItem {
+  id            String    @id @default(cuid())
+  orderId       String
+  order         Order     @relation(fields: [orderId], references: [id])
+  menuItemId    String
+  menuItem      MenuItem  @relation(fields: [menuItemId], references: [id])
+  quantity      Int
+  unitPrice     Float
+  totalPrice    Float
+  // Customizations
+  customizations Json?    // Store customizations as JSON
+  notes         String?
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([orderId])
+  @@index([menuItemId])
+}
+
+// Review model
+model Review {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  restaurantId  String
+  restaurant    Restaurant @relation(fields: [restaurantId], references: [id])
+  orderId       String    @unique
+  order         Order     @relation(fields: [orderId], references: [id])
+  rating        Int       // 1-5 stars
+  comment       String?   @db.Text
+  photos        String[]  // Array of photo URLs
+  // Restaurant response
+  response      String?   @db.Text
+  respondedAt   DateTime?
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime? // Soft delete
+
+  @@index([userId])
+  @@index([restaurantId])
+  @@index([rating])
+}
+
+// Address model
+model Address {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  type            String    // "home", "office", "other"
+  label           String?   // User-defined label
+  street          String
+  city            String
+  state           String
+  postalCode      String?
+  country         String    @default("Nepal")
+  // Coordinates for delivery routing
+  latitude        Float?
+  longitude       Float?
+  // Additional info
+  landmark        String?
+  deliveryNotes   String?
+  // For restaurant addresses
+  restaurant      Restaurant?
+  // For delivery addresses in orders
+  orders          Order[]
+  isDefault       Boolean   @default(false)
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([city])
+}
+
+
+model RateLimit {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  count     Int      @default(0)
+  resetAt   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+  @@index([resetAt])
+}
+
+// Payment model
+model Payment {
+  id              String        @id @default(cuid())
+  orderId         String        @unique
+  order           Order         @relation(fields: [orderId], references: [id])
+  amount          Float
+  method          PaymentMethod
+  status          PaymentStatus @default(PENDING)
+  // Transaction details
+  transactionId   String?       @unique
+  paymentIntentId String?       @unique
+  refundId        String?
+  // Status timestamps
+  paidAt          DateTime?
+  refundedAt      DateTime?
+  failedAt        DateTime?
+  // Additional info
+  currency        String        @default("NPR")
+  failureReason   String?
+  refundReason    String?
+  // Timestamps
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([status])
+  @@index([method])
+  @@index([createdAt])
 }
