@@ -23,6 +23,15 @@ export interface LoginCredentials {
     password: string;
 }
 
+export interface GoogleAuthCredentials {
+    token: string;
+  }
+  
+  export interface EmailVerificationPayload {
+    email: string;
+    token: string;
+  }
+
 export interface SignupCredentials {
     email: string;
     password: string;

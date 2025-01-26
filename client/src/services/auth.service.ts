@@ -1,43 +1,22 @@
+// src/services/auth.service.ts
+
 import api from './api';
-
-export interface SignupData {
-  email: string;
-  password: string;
-  name: string;
-}
-
-export interface LoginData {
-  email: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  success: boolean;
-  data?: {
-    user: {
-      id: string;
-      email: string;
-      name: string;
-      role: string;
-      createdAt: string;
-    };
-    token: string;
-  };
-  error?: string;
-  message?: string;
-}
+import type { 
+  SignupCredentials, 
+  LoginCredentials, 
+  AuthResponse,
+  PasswordResetRequest,
+  PasswordResetSubmission 
+} from '../types/auth.type';
 
 const TOKEN_KEY = 'auth_token';
 
 class AuthService {
-  async login(data: LoginData): Promise<AuthResponse> {
+  async login(data: LoginCredentials): Promise<AuthResponse> {
     try {
       const response = await api.post('/auth/login', data);
-      console.log('Login response:', response.data);
-
       if (response.data.success) {
-        localStorage.setItem(TOKEN_KEY, response.data.data.token);
-        api.defaults.headers.common['Authorization'] = `Bearer ${response.data.data.token}`;
+        this.setToken(response.data.data.token);
       }
       return response.data;
     } catch (error: any) {
@@ -46,16 +25,62 @@ class AuthService {
     }
   }
 
-  async signup(data: SignupData): Promise<AuthResponse> {
+// client/src/services/auth.service.ts
+async signup(data: SignupCredentials): Promise<AuthResponse> {
+  try {
+    console.log('Sending signup request with data:', data);
+    const response = await api.post('/auth/signup', data);
+    console.log('Signup response:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Signup error details:', {
+      response: error.response?.data,
+      status: error.response?.status,
+      message: error.message
+    });
+    throw error;
+  }
+}
+
+async googleLogin(code: string): Promise<AuthResponse> {
+  try {
+    const response = await api.post('/auth/google', { code });
+    if (response.data.success) {
+      this.setToken(response.data.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    console.error('Google login error:', error);
+    throw error;
+  }
+}
+
+  async verifyEmail(token: string): Promise<AuthResponse> {
     try {
-      const response = await api.post('/auth/signup', data);
-      if (response.data.success) {
-        localStorage.setItem(TOKEN_KEY, response.data.data.token);
-        api.defaults.headers.common['Authorization'] = `Bearer ${response.data.data.token}`;
-      }
+      const response = await api.get(`/auth/verify-email/${token}`);
       return response.data;
-    } catch (error) {
-      console.error('Signup error:', error);
+    } catch (error: any) {
+      console.error('Email verification error:', error.response?.data || error);
+      throw error;
+    }
+  }
+
+  async requestPasswordReset(data: PasswordResetRequest): Promise<AuthResponse> {
+    try {
+      const response = await api.post('/auth/request-password-reset', data);
+      return response.data;
+    } catch (error: any) {
+      console.error('Password reset request error:', error.response?.data || error);
+      throw error;
+    }
+  }
+
+  async resetPassword(data: PasswordResetSubmission): Promise<AuthResponse> {
+    try {
+      const response = await api.post('/auth/reset-password', data);
+      return response.data;
+    } catch (error: any) {
+      console.error('Password reset error:', error.response?.data || error);
       throw error;
     }
   }
@@ -63,6 +88,11 @@ class AuthService {
   logout() {
     localStorage.removeItem(TOKEN_KEY);
     delete api.defaults.headers.common['Authorization'];
+  }
+
+  private setToken(token: string) {
+    localStorage.setItem(TOKEN_KEY, token);
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   }
 
   getToken() {
