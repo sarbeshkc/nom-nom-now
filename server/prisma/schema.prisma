@@ -1,43 +1,164 @@
+// This is the updated schema.prisma file with improved models
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:140805@localhost:5432/postgres"
+  url      = env("DATABASE_URL")
 }
-
-
 
 model User {
-  id                String    @id @default(uuid())
-  email             String    @unique
+  id                String      @id @default(uuid())
+  email             String      @unique
   password          String
   name              String
-  role              Role      @default(USER)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  googleId          String?   @unique
-  emailVerified     Boolean   @default(false)
-  verificationToken String?   @unique
+  role              Role        @default(USER)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  googleId          String?     @unique
+  emailVerified     Boolean     @default(false)
+  verificationToken String?     @unique
   resetToken        String?   
   resetTokenExpiry  DateTime?
+  restaurant        Restaurant?
+  orders            Order[]
 }
+
 model Restaurant {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  address     String
-  rating      Float    @default(0)
-  cuisine     String[]
-  openingHours Json
-  image       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                      String              @id @default(cuid())
+  userId                  String              @unique
+  businessName           String
+  businessRegistrationNumber String?
+  ownerName              String
+  email                  String              @unique
+  phone                  String
+  alternatePhone         String?
+  address                Json                // Will contain street, ward, city, province, latitude, longitude
+  description            String              @db.Text
+  cuisineTypes           String[]
+  categories             RestaurantCategory[]
+  businessHours          Json                // Will contain opening/closing hours for each day
+  menu                   MenuItem[]
+  minimumOrder           Float
+  averagePreparationTime Int
+  status                 RestaurantStatus    @default(PENDING)
+  isOpen                 Boolean             @default(false)
+  rating                 Float               @default(0)
+  totalRatings           Int                 @default(0)
+  documents              Json?               // Will contain document URLs/paths
+  bankDetails            Json?               // Will contain bank account information
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
+  user                   User                @relation(fields: [userId], references: [id])
+  orders                 Order[]
+  deliveryZones         DeliveryZone[]
+
+  @@index([status])
+  @@index([cuisineTypes])
+}
+
+// New DeliveryZone model for better delivery area management
+model DeliveryZone {
+  id            String    @id @default(cuid())
+  restaurantId  String
+  name          String    // e.g., "Central Kathmandu", "Patan Area"
+  radius        Float     // in kilometers
+  baseDeliveryFee Float
+  minimumOrder  Float
+  // Define zone boundaries
+  boundaries    Json      // GeoJSON Polygon coordinates
+  estimatedTime Int      // Estimated delivery time in minutes
+  isActive      Boolean   @default(true)
+  restaurant    Restaurant @relation(fields: [restaurantId], references: [id])
+  
+  @@index([restaurantId])
+}
+
+// Updated MenuItem model with preparation time
+model MenuItem {
+  id                String    @id @default(cuid())
+  restaurantId      String
+  name              String
+  description       String?
+  price             Float
+  category          String
+  preparationTime   Int       // Added field for prep time in minutes
+  isAvailable       Boolean   @default(true)
+  imageUrl          String?
+  customization     Json?     // For custom options like spice level, size, etc.
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  restaurant        Restaurant @relation(fields: [restaurantId], references: [id])
+
+  @@index([restaurantId])
+  @@index([category])
+}
+
+model Order {
+  id                  String    @id @default(cuid())
+  userId              String
+  restaurantId        String
+  orderNumber         String    @unique
+  items               Json[]
+  total               Float
+  status              OrderStatus @default(PENDING)
+  paymentStatus       PaymentStatus @default(PENDING)
+  paymentMethod       String?
+  deliveryAddress     Json
+  specialInstructions String?
+  estimatedDeliveryTime DateTime?
+  actualDeliveryTime    DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  restaurant          Restaurant @relation(fields: [restaurantId], references: [id])
+  user                User      @relation(fields: [userId], references: [id])
+
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([createdAt])
 }
 
 enum Role {
   USER
   ADMIN
   RESTAURANT_OWNER
+}
+
+enum RestaurantStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+// New enum for restaurant categories
+enum RestaurantCategory {
+  CASUAL_DINING
+  FINE_DINING
+  FAST_FOOD
+  CAFE
+  STREET_FOOD
+  BUFFET
+  FAMILY_STYLE
+  FOOD_TRUCK
+  DELIVERY_ONLY
 }
