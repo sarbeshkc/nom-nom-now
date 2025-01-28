@@ -1,64 +1,76 @@
-Here's a clean and straightforward `README.md`:
+# Nom Nom Now 🍽️
 
-```markdown
-# Nom Nom Now
+A modern food delivery application based in Kathmandu, simplifying local food ordering with a seamless user experience.
 
-A food delivery application based in Kathmandu, built with React (Vite), Node.js, and PostgreSQL.
+## 🚀 Features
+- User-friendly food ordering platform
+- Google OAuth authentication
+- Secure JWT-based authentication
+- Responsive design with TailwindCSS
+- Real-time order tracking
 
-## Tech Stack
+## 💻 Tech Stack
 
 ### Frontend
-- React + TypeScript
-- Vite
-- TailwindCSS
-- shadcn/ui
-- React Query
-- React Router
+- **Framework**: React + TypeScript
+- **Build Tool**: Vite
+- **Styling**: TailwindCSS
+- **UI Components**: shadcn/ui
+- **State Management**: React Query
+- **Routing**: React Router
 
 ### Backend
-- Node.js + TypeScript
-- Express.js
-- Prisma ORM
-- PostgreSQL
+- **Runtime**: Node.js + TypeScript
+- **Web Framework**: Express.js
+- **ORM**: Prisma
+- **Database**: PostgreSQL
+- **Authentication**: 
+  - JWT Authentication
+  - OAuth2 (Google Sign-In)
 
-## Prerequisites
+## 🛠️ Prerequisites
 
+Before you begin, ensure you have the following installed:
 - Node.js (v18 or higher)
 - PostgreSQL
 - npm
+- Google Developer Account (for OAuth)
 
-## Project Structure
+## 📦 Project Structure
 
 ```
 nom-nom-now/
-├── client/                 
+│
+├── client/                 # React frontend
 │   ├── src/
-│   │   ├── components/    
-│   │   ├── hooks/        
-│   │   ├── pages/        
-│   │   ├── services/     
-│   │   └── utils/        
-│   └── package.json
-├── server/                
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   └── utils/
+│   └── vite.config.ts
+│
+├── server/                 # Node.js backend
 │   ├── src/
-│   │   ├── controllers/  
-│   │   ├── models/       
-│   │   ├── routes/       
-│   │   └── utils/        
-│   ├── prisma/          
-│   └── package.json
-└── package.json
+│   │   ├── controllers/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── middleware/
+│   │   └── utils/
+│   └── prisma/
+│       └── schema.prisma
+│
+└── README.md
 ```
 
-## Setup Instructions
+## 🚧 Setup Instructions
 
-1. Clone the repository:
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/sarbeshkc/nom-nom-now
 cd nom-nom-now
 ```
 
-2. Install dependencies:
+### 2. Install Dependencies
 ```bash
 # Root dependencies
 npm install
@@ -70,116 +82,92 @@ cd client && npm install
 cd ../server && npm install
 ```
 
-3. Database setup:
+### 3. Database Setup
 ```bash
-# Create database
+# Create PostgreSQL database
 createdb nom_nom_now
 
-# Setup environment variables
+# Navigate to server directory
 cd server
+
+# Copy environment template
 cp .env.example .env
-# Update DATABASE_URL in .env with your PostgreSQL credentials
-
-# Run migrations
-npx prisma migrate dev
-
-# Seed the database
-npm run seed
 ```
 
-4. Start development servers:
-```bash
-# In root directory
-npm run dev
-```
+### 4. Environment Configuration
+Create and configure the following environment files:
 
-This will start:
-- Frontend server on http://localhost:3000
-- Backend server on http://localhost:4000
-
-## Environment Variables
-
-### Server (.env)
+#### Server Environment (`server/.env`)
 ```env
+# Database Configuration
+DATABASE_URL="postgresql://YOUR_DB_USER:YOUR_DB_PASSWORD@localhost:5432/nom_nom_now"
+
+# Authentication Secrets
+JWT_SECRET="your_strong_jwt_secret_here"
+JWT_ACCESS_SECRET="your_access_token_secret"
+JWT_REFRESH_SECRET="your_refresh_token_secret"
+
+# Google OAuth Credentials
+GOOGLE_CLIENT_ID="your_google_client_id"
+GOOGLE_CLIENT_SECRET="your_google_client_secret"
+
+# Email Service
+EMAIL_USER="your_email@gmail.com"
+EMAIL_PASSWORD="your_app_specific_password"
+
+# Optional Configuration
 PORT=4000
-DATABASE_URL="postgresql://postgres:password@localhost:5432/nom_nom_now"
-JWT_SECRET="your-secret-key"
+NODE_ENV=development
+CLIENT_URL="http://localhost:3000"
 CORS_ORIGIN="http://localhost:3000"
+
+# Token Expirations
+JWT_ACCESS_EXPIRY="15m"
+JWT_REFRESH_EXPIRY="7d"
 ```
 
-### Client (.env)
+#### Client Environment (`client/.env`)
 ```env
 VITE_API_URL="http://localhost:4000/api"
 ```
 
-## Available Scripts
-
-In the project root directory:
+### 5. Database Migrations
 ```bash
-npm run dev          # Run both frontend and backend
-npm run dev:client   # Run only frontend
-npm run dev:server   # Run only backend
+# Run database migrations
+npx prisma migrate dev
+
+# Seed initial data
+npm run seed
 ```
 
-## Features
-
-- Restaurant listing and search
-- Menu management
-- Order processing
-- Real-time order tracking
-- User authentication
-- Restaurant reviews and ratings
-
-## API Routes
-
-### Public Routes
-- `GET /api/health` - Health check
-- `GET /api/restaurants` - Get all restaurants
-- `GET /api/restaurants/:id` - Get restaurant details
-
-### Protected Routes
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `GET /api/user/profile` - Get user profile
+### 6. Start Development Servers
+```bash
+# From root directory
+npm run dev
 ```
 
-Also create a `.gitignore` file in the root directory:
+## 🔐 OAuth Setup Guide
 
-```gitignore
-# Dependencies
-node_modules
-.pnp
-.pnp.js
+### Google OAuth Configuration
+1. Visit [Google Cloud Console](https://console.cloud.google.com/)
+2. Create new project → APIs & Services → Credentials
+3. Create OAuth Client ID (Web Application)
+4. Add authorized redirect URI: `http://localhost:4000/api/auth/google/callback`
+5. Copy Client ID and Client Secret to `.env`
 
-# Environment
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+### Email Setup
+- For Gmail: Use App Passwords (enable 2-factor authentication first)
+- For other providers: Update SMTP settings accordingly
 
-# Build
-dist
-build
+## ⚠️ Security Notes
+- **Never commit `.env` files to version control**
+- Use strong, unique secrets (64+ random characters)
+- Regenerate all example secrets before production deployment
 
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
-# IDE
-.idea
-.vscode
-*.swp
-*.swo
-.DS_Store
-Thumbs.db
 
-# Testing
-coverage
 
-# Prisma
-prisma/*.db
-```
+## 📞 Contact
+Sarbesh KC - [sarbeshckcc07@gmail.com]
+
+Project Link: [https://github.com/sarbeshkc/nom-nom-now](https://github.com/sarbeshkc/nom-nom-now)
