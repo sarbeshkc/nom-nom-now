@@ -1,18 +1,22 @@
-// components/auth/LoginPage.tsx
+// src/pages/auth/LoginPage.tsx
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 import AuthService from '@/services/auth.service';
+import { useAuthStore } from '@/store/auth-store';
+import { useAuth } from '@/contexts/AuthContext';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Mail, Lock } from 'lucide-react';
-import { GoogleLoginButton } from '../../components/GoogleLoginButton';
+import { GoogleLoginButton } from '@/components/GoogleLoginButton';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { setUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -20,6 +24,8 @@ export default function LoginPage() {
     email: '',
     password: '',
   });
+
+  const from = location.state?.from || '/home';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +36,8 @@ export default function LoginPage() {
       const response = await AuthService.login(formData);
       if (response.success && response.data?.user) {
         setUser(response.data.user);
-        navigate('/');
+        localStorage.setItem('token', response.data.token);
+        navigate(from, { replace: true });
       }
     } catch (err: any) {
       setError(err.response?.data?.error || 'An error occurred during login');
@@ -56,11 +63,10 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-700">Email</Label>
+              <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Input
                   id="email"
-                  name="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({...prev, email: e.target.value}))}
@@ -73,19 +79,10 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-gray-700">Password</Label>
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-[#FF4500] hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
+              <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Input
                   id="password"
-                  name="password"
                   type="password"
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({...prev, password: e.target.value}))}
@@ -127,12 +124,13 @@ export default function LoginPage() {
 
             <div className="text-center text-sm">
               <span className="text-gray-600">Don't have an account? </span>
-              <Link
-                to="/signup"
-                className="text-[#FF4500] hover:underline font-medium"
+              <Button
+                variant="link"
+                className="text-[#FF4500] hover:text-[#FF4500]/90 p-0"
+                onClick={() => navigate('/signup')}
               >
                 Sign up
-              </Link>
+              </Button>
             </div>
           </form>
         </CardContent>

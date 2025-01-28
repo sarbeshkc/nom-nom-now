@@ -1,3 +1,4 @@
+// src/services/api.ts
 import axios from "axios";
 
 const api = axios.create({
@@ -7,31 +8,38 @@ const api = axios.create({
     },
 });
 
-// Request interceptor for debugging
+// Request interceptor
 api.interceptors.request.use(
     (config) => {
-        console.log('Request being sent:', {
-            url: config.url,
-            method: config.method,
-            data: config.data,
-            headers: config.headers
-        });
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
         return config;
     },
     (error) => {
-        console.error('Request error:', error);
         return Promise.reject(error);
     }
 );
 
-// Response interceptor for debugging
+// Response interceptor
 api.interceptors.response.use(
-    (response) => {
-        console.log('Response received:', response);
-        return response;
-    },
-    (error) => {
-        console.error('Response error:', error.response?.data || error.message);
+    (response) => response,
+    async (error) => {
+        const originalRequest = error.config;
+
+        // Handle 401 errors (unauthorized)
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            
+            // Clear auth state
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            
+            // Force reload the page to reset the app state
+            window.location.href = '/login';
+        }
+
         return Promise.reject(error);
     }
 );

@@ -2,14 +2,17 @@ import { useState } from 'react';
 import { useGoogleLogin } from '@react-oauth/google';
 import AuthService from '@/services/auth.service';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 export function GoogleLoginButton() {
   const { setUser } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const from = location.state?.from || '/home';
 
   const login = useGoogleLogin({
     flow: 'auth-code',
@@ -18,8 +21,10 @@ export function GoogleLoginButton() {
       try {
         const authResponse = await AuthService.googleLogin(response.code);
         if (authResponse.success && authResponse.data?.user) {
+          localStorage.setItem('token', authResponse.data.token);
+          localStorage.setItem('user', JSON.stringify(authResponse.data.user));
           setUser(authResponse.data.user);
-          navigate('/');
+          navigate(from, { replace: true });
         }
       } catch (error) {
         console.error('Google login error:', error);

@@ -1,3 +1,4 @@
+// src/components/ProtectedRoute.tsx
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -17,7 +18,7 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    return <Navigate to="/home" state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
   // Check role-based access if roles are specified
