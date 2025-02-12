@@ -8,22 +8,49 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
+// Update the User model in schema.prisma
 model User {
   id                String      @id @default(uuid())
   email             String      @unique
   password          String
   name              String
   role              Role        @default(USER)
+  avatar            String?     // URL to stored avatar image
+  phoneNumbers      PhoneNumber[]
+  addresses         Address[]
+  bio              String?     @db.Text
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
-  googleId          String?     @unique
   emailVerified     Boolean     @default(false)
   verificationToken String?     @unique
   resetToken        String?   
   resetTokenExpiry  DateTime?
+  googleId          String?     @unique
   restaurant        Restaurant?
   orders            Order[]
+}
+
+model PhoneNumber {
+  id        String   @id @default(uuid())
+  number    String
+  isPrimary Boolean  @default(false)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model Address {
+  id          String   @id @default(uuid())
+  street      String
+  city        String
+  province    String
+  ward        Int
+  isPrimary   Boolean  @default(false)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 model Restaurant {

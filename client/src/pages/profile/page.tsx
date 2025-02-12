@@ -1,49 +1,43 @@
 // src/pages/profile/page.tsx
-import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/Footer';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
-import { User, Lock, MapPin, Clock } from 'lucide-react';
+import { ProfileForm } from '@/components/profile/ProfileForm';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import ProfileService from '@/services/profile.service';
+import { Loader2, User, Shield, CreditCard } from 'lucide-react';
 
 export default function ProfilePage() {
-  const { user, setUser } = useAuth();
+  const [userData, setUserData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-  });
 
-  // Mock order history data - replace with actual API call
-  const orderHistory = [
-    {
-      id: '1',
-      date: '2024-01-25',
-      restaurant: 'Pizza Palace',
-      total: 850,
-      status: 'Delivered'
-    },
-    {
-      id: '2',
-      date: '2024-01-23',
-      restaurant: 'Burger King',
-      total: 650,
-      status: 'Delivered'
-    }
-  ];
+  useEffect(() => {
+    loadProfile();
+  }, []);
 
-  const handleUpdateProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const loadProfile = async () => {
     try {
-      // Add API call to update profile here
-      setUser({ ...user!, ...formData });
-      setIsEditing(false);
+      const response = await ProfileService.getProfile();
+      setUserData(response.data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load profile data",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateProfile = async (formData: FormData) => {
+    try {
+      const response = await ProfileService.updateProfile(formData);
+      setUserData(response.data);
       toast({
         title: "Success",
         description: "Profile updated successfully",
@@ -56,6 +50,14 @@ export default function ProfilePage() {
       });
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -71,105 +73,28 @@ export default function ProfilePage() {
                   <User className="h-4 w-4" />
                   Profile
                 </TabsTrigger>
-                <TabsTrigger value="orders" className="flex gap-2">
-                  <Clock className="h-4 w-4" />
-                  Order History
-                </TabsTrigger>
-                <TabsTrigger value="addresses" className="flex gap-2">
-                  <MapPin className="h-4 w-4" />
-                  Saved Addresses
-                </TabsTrigger>
                 <TabsTrigger value="security" className="flex gap-2">
-                  <Lock className="h-4 w-4" />
+                  <Shield className="h-4 w-4" />
                   Security
+                </TabsTrigger>
+                <TabsTrigger value="payment" className="flex gap-2">
+                  <CreditCard className="h-4 w-4" />
+                  Payment Methods
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="profile">
                 <Card>
                   <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle>Personal Information</CardTitle>
-                      <Button
-                        variant="outline"
-                        onClick={() => setIsEditing(!isEditing)}
-                      >
-                        {isEditing ? 'Cancel' : 'Edit Profile'}
-                      </Button>
-                    </div>
+                    <CardTitle>Profile Information</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <form onSubmit={handleUpdateProfile} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="name">Full Name</Label>
-                        <Input
-                          id="name"
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          disabled={!isEditing}
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          disabled={!isEditing}
-                        />
-                      </div>
-
-                      {isEditing && (
-                        <Button type="submit" className="bg-[#FF4500] hover:bg-[#FF4500]/90">
-                          Save Changes
-                        </Button>
-                      )}
-                    </form>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="orders">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Order History</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {orderHistory.map((order) => (
-                        <div
-                          key={order.id}
-                          className="flex items-center justify-between p-4 border rounded-lg"
-                        >
-                          <div>
-                            <h3 className="font-medium">{order.restaurant}</h3>
-                            <p className="text-sm text-gray-500">{order.date}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium">NPR {order.total}</p>
-                            <p className="text-sm text-green-600">{order.status}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="addresses">
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle>Saved Addresses</CardTitle>
-                      <Button className="bg-[#FF4500] hover:bg-[#FF4500]/90">
-                        Add New Address
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-500">No saved addresses yet.</p>
+                    {userData && (
+                      <ProfileForm 
+                        user={userData} 
+                        onUpdate={handleUpdateProfile} 
+                      />
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -187,6 +112,20 @@ export default function ProfilePage() {
                     <div>
                       <h3 className="font-medium mb-2">Two-Factor Authentication</h3>
                       <Button variant="outline">Enable 2FA</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="payment">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Payment Methods</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-8">
+                      <p className="text-gray-500 mb-4">No payment methods added yet.</p>
+                      <Button>Add Payment Method</Button>
                     </div>
                   </CardContent>
                 </Card>
