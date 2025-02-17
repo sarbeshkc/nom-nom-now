@@ -14,6 +14,14 @@ interface BasicMapProps {
   onLocationSelect: (lat: number, lng: number) => void;
 }
 
+
+const customIcon = L.icon({
+    iconUrl: '/marker-map1.png', // Access from public folder
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32]
+  });
+  
 const BasicMap = ({ onLocationSelect }: BasicMapProps) => {
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
@@ -33,9 +41,9 @@ const BasicMap = ({ onLocationSelect }: BasicMapProps) => {
 
     // Add initial marker
     const marker = L.marker([27.7172, 85.3240], { 
-      draggable: true 
-    }).addTo(map);
-    markerRef.current = marker;
+        draggable: true,
+        icon: customIcon 
+      }).addTo(map);
 
     // Map click handler
     map.on('click', (e) => {
