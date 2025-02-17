@@ -1,4 +1,4 @@
-// This is the updated schema.prisma file with improved models
+// This is your Prisma schema file
 
 generator client {
   provider = "prisma-client-js"
@@ -8,7 +8,7 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-// Update the User model in schema.prisma
+
 model User {
   id                String      @id @default(uuid())
   email             String      @unique
@@ -81,12 +81,13 @@ model Restaurant {
   user                   User                @relation(fields: [userId], references: [id])
   orders                 Order[]
   deliveryZones         DeliveryZone[]
+  featuredItems         MenuItem[]          @relation("FeaturedItems")
+  popularItems          MenuItem[]          @relation("PopularItems")
 
   @@index([status])
   @@index([cuisineTypes])
 }
 
-// New DeliveryZone model for better delivery area management
 model DeliveryZone {
   id            String    @id @default(cuid())
   restaurantId  String
@@ -94,7 +95,6 @@ model DeliveryZone {
   radius        Float     // in kilometers
   baseDeliveryFee Float
   minimumOrder  Float
-  // Define zone boundaries
   boundaries    Json      // GeoJSON Polygon coordinates
   estimatedTime Int      // Estimated delivery time in minutes
   isActive      Boolean   @default(true)
@@ -103,21 +103,28 @@ model DeliveryZone {
   @@index([restaurantId])
 }
 
-// Updated MenuItem model with preparation time
 model MenuItem {
   id                String    @id @default(cuid())
   restaurantId      String
   name              String
-  description       String?
+  description       String?   @db.Text  // Changed to Text for longer descriptions
   price             Float
   category          String
-  preparationTime   Int       // Added field for prep time in minutes
+  preparationTime   Int      
   isAvailable       Boolean   @default(true)
-  imageUrl          String?
-  customization     Json?     // For custom options like spice level, size, etc.
+  imageUrl          String    // Made required since we need images
+  customization     Json?    
+  featured          Boolean   @default(false)  // New field for featured items
+  calories          Int?      // New optional field for nutritional info
+  allergens         String[]  // New field for allergen information
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   restaurant        Restaurant @relation(fields: [restaurantId], references: [id])
+  orderCount        Int       @default(0)  // New field to track popularity
+  featuredIn        Restaurant? @relation("FeaturedItems", fields: [featuredInId], references: [id])
+  featuredInId      String?
+  popularIn         Restaurant? @relation("PopularItems", fields: [popularInId], references: [id])
+  popularInId       String?
 
   @@index([restaurantId])
   @@index([category])
@@ -141,6 +148,9 @@ model Order {
   updatedAt           DateTime  @updatedAt
   restaurant          Restaurant @relation(fields: [restaurantId], references: [id])
   user                User      @relation(fields: [userId], references: [id])
+  rating              Int?      // New field for order rating
+  review              String?   @db.Text  // New field for order review
+  reviewDate          DateTime?  // New field for review date
 
   @@index([status])
   @@index([paymentStatus])
@@ -177,7 +187,6 @@ enum PaymentStatus {
   REFUNDED
 }
 
-// New enum for restaurant categories
 enum RestaurantCategory {
   CASUAL_DINING
   FINE_DINING
