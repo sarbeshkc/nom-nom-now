@@ -1,43 +1,21 @@
+// src/services/auth.service.ts
 import api from './api';
-
-export interface SignupData {
-  email: string;
-  password: string;
-  name: string;
-}
-
-export interface LoginData {
-  email: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  success: boolean;
-  data?: {
-    user: {
-      id: string;
-      email: string;
-      name: string;
-      role: string;
-      createdAt: string;
-    };
-    token: string;
-  };
-  error?: string;
-  message?: string;
-}
-
-const TOKEN_KEY = 'auth_token';
+import type { 
+  SignupCredentials, 
+  LoginCredentials, 
+  AuthResponse,
+  PasswordResetRequest,
+  PasswordResetSubmission 
+} from '../types/auth.type';
 
 class AuthService {
-  async login(data: LoginData): Promise<AuthResponse> {
+  async login(data: LoginCredentials): Promise<AuthResponse> {
     try {
       const response = await api.post('/auth/login', data);
-      console.log('Login response:', response.data);
-
       if (response.data.success) {
-        localStorage.setItem(TOKEN_KEY, response.data.data.token);
-        api.defaults.headers.common['Authorization'] = `Bearer ${response.data.data.token}`;
+        this.setToken(response.data.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.data.user));
+        this.initializeAuth();
       }
       return response.data;
     } catch (error: any) {
@@ -46,31 +24,76 @@ class AuthService {
     }
   }
 
-  async signup(data: SignupData): Promise<AuthResponse> {
+  async signup(data: SignupCredentials): Promise<AuthResponse> {
     try {
       const response = await api.post('/auth/signup', data);
-      if (response.data.success) {
-        localStorage.setItem(TOKEN_KEY, response.data.data.token);
-        api.defaults.headers.common['Authorization'] = `Bearer ${response.data.data.token}`;
-      }
       return response.data;
-    } catch (error) {
-      console.error('Signup error:', error);
+    } catch (error: any) {
+      console.error('Signup error:', error.response?.data || error);
       throw error;
     }
   }
 
-  logout() {
-    localStorage.removeItem(TOKEN_KEY);
-    delete api.defaults.headers.common['Authorization'];
+  async googleLogin(code: string): Promise<AuthResponse> {
+    try {
+      const response = await api.post('/auth/google', { code });
+      if (response.data.success) {
+        this.setToken(response.data.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.data.user));
+        this.initializeAuth();
+      }
+      return response.data;
+    } catch (error) {
+      console.error('Google login error:', error);
+      throw error;
+    }
   }
 
-  getToken() {
-    return localStorage.getItem(TOKEN_KEY);
+  async verifyEmail(token: string): Promise<AuthResponse> {
+    try {
+      const response = await api.get(`/auth/verify-email/${token}`);
+      return response.data;
+    } catch (error: any) {
+      console.error('Email verification error:', error);
+      throw error;
+    }
   }
 
-  isAuthenticated() {
-    return !!this.getToken();
+  async requestPasswordReset(data: PasswordResetRequest): Promise<AuthResponse> {
+    try {
+      const response = await api.post('/auth/request-password-reset', data);
+      return response.data;
+    } catch (error: any) {
+      console.error('Password reset request error:', error);
+      throw error;
+    }
+  }
+
+  async resetPassword(data: PasswordResetSubmission): Promise<AuthResponse> {
+    try {
+      const response = await api.post('/auth/reset-password', data);
+      return response.data;
+    } catch (error: any) {
+      console.error('Password reset error:', error);
+      throw error;
+    }
+  }
+
+  checkAuthState() {
+    const token = this.getToken();
+    const userStr = localStorage.getItem('user');
+    
+    if (!token || !userStr) {
+      return null;
+    }
+
+    try {
+      const user = JSON.parse(userStr);
+      return { user, token };
+    } catch (error) {
+      this.logout();
+      return null;
+    }
   }
 
   initializeAuth() {
@@ -78,6 +101,25 @@ class AuthService {
     if (token) {
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
+  }
+
+  private setToken(token: string) {
+    localStorage.setItem('token', token);
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  }
+
+  getToken() {
+    return localStorage.getItem('token');
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    delete api.defaults.headers.common['Authorization'];
+  }
+
+  isAuthenticated() {
+    return !!this.getToken() && !!localStorage.getItem('user');
   }
 }
 
