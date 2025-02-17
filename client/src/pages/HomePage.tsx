@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Header } from '@/components/header';
 import { Footer } from '@/components/Footer';
+import { Link } from "react-router-dom";
+
 // import Image from 'next/image';
 
 const HomePage = () => {
@@ -112,9 +114,19 @@ const HomePage = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <Input placeholder="Search for dishes..." className="pl-10 bg-gray-50" />
                 </div>
-                <Button className="bg-[#FF780B] hover:bg-[#F1954B]/90">
+                {/* <Button className="bg-[#FF780B] hover:bg-[#F1954B]/90">
                   How To Order
-                </Button>
+                </Button> */}
+
+
+<Link to="/how-to-order">
+  <Button className="bg-[#FF780B] hover:bg-[#F1954B]/90">
+    How To Order
+  </Button>
+</Link>
+
+
+
               </div>
             </div>
             <div className="relative h-[400px]">
@@ -225,9 +237,11 @@ const HomePage = () => {
                 <span className="text-[#F1954B]">dining out becomes effortless and rewarding</span>—
                 reserve in real-time and enjoy exclusive perks!
               </p>
-              <Button className="bg-[#F1954B] hover:bg-[#F1954B]/90">
-                Make Reservation
-              </Button>
+              <Link to="/reservation">
+  <Button className="bg-[#F1954B] hover:bg-[#F1954B]/90">
+    Make Reservation
+  </Button>
+</Link>
             </div>
             <div className="rounded-xl overflow-hidden h-[300px]">
               {/* <Image

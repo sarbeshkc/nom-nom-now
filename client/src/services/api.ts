@@ -5,6 +5,8 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: true // Important for CORS
+
 });
 
 // Request interceptor for debugging
@@ -24,16 +26,25 @@ api.interceptors.request.use(
     }
 );
 
-// Response interceptor for debugging
 api.interceptors.response.use(
-    (response) => {
-        console.log('Response received:', response);
-        return response;
-    },
+    (response) => response,
     (error) => {
-        console.error('Response error:', error.response?.data || error.message);
-        return Promise.reject(error);
+      console.error('Response error:', error);
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error('Error data:', error.response.data);
+        console.error('Error status:', error.response.status);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error('No response received:', error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error('Error message:', error.message);
+      }
+      return Promise.reject(error);
     }
-);
+  );
+  
 
 export default api;

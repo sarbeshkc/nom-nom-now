@@ -25,6 +25,10 @@ export interface User {
     email: string;
     password: string;
     name: string;
+    location: {
+      latitude: number;
+      longitude: number;
+    };
   }
   
   export interface AuthResponse {

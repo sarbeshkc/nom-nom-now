@@ -1,4 +1,3 @@
-// components/auth/SignupPage.tsx
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AuthService from '@/services/auth.service';
@@ -7,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Mail, Lock, User } from 'lucide-react';
-import { GoogleLoginButton } from '../../components/GoogleLoginButton';
+import { Loader2, Mail, Lock, User, MapPin } from 'lucide-react';
+import { GoogleLoginButton } from '@/components/GoogleLoginButton';
+import BasicMap from '@/components/ui/MapComponent';
 
 export default function SignupPage() {
   const [loading, setLoading] = useState(false);
@@ -19,7 +19,23 @@ export default function SignupPage() {
     email: '',
     password: '',
     confirmPassword: '',
+    location: {
+      latitude: 27.7172,
+      longitude: 85.3240
+    }
   });
+
+  // Add the handleLocationSelect function
+  const handleLocationSelect = (lat: number, lng: number) => {
+    setFormData(prev => ({
+      ...prev,
+      location: {
+        latitude: lat,
+        longitude: lng
+      }
+    }));
+    console.log('Location selected:', lat, lng); // For debugging
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +50,8 @@ export default function SignupPage() {
 
     try {
       const { confirmPassword, ...signupData } = formData;
+      console.log('Sending signup data:', signupData); // For debugging
+      
       const response = await AuthService.signup(signupData);
       
       if (response.success) {
@@ -42,6 +60,7 @@ export default function SignupPage() {
         setError(response.error || 'Registration failed');
       }
     } catch (err: any) {
+      console.error('Signup error:', err);
       setError(err.response?.data?.error || 'An error occurred during registration');
     } finally {
       setLoading(false);
@@ -152,6 +171,16 @@ export default function SignupPage() {
                   required
                 />
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-[#FF4500]" />
+                Select Your Location
+              </Label>
+              <div className="rounded-lg overflow-hidden border border-gray-200">
+                <BasicMap onLocationSelect={handleLocationSelect} />
               </div>
             </div>
 

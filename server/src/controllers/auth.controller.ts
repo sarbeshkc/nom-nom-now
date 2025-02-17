@@ -16,84 +16,80 @@ const prisma = new PrismaClient();
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const AuthController = {
-  signup: async (req: Request, res: Response) => {
-    try {
-      console.log('Signup request body:', req.body);
-      const { email, password, name } = req.body;
+// server/src/controllers/auth.controller.ts
+signup: async (req: Request, res: Response) => {
+  try {
+    console.log('Received signup request:', req.body); // Add logging
+    const { email, password, name, location } = req.body;
 
-      // Input validation
-      if (!email || !password || !name) {
-        return res.status(400).json(errorResponse('All fields are required'));
-      }
-
-      if (password.length < constants.PASSWORD_MIN_LENGTH) {
-        return res.status(400).json(
-          errorResponse(`Password must be at least ${constants.PASSWORD_MIN_LENGTH} characters`)
-        );
-      }
-
-      // Check for existing user
-      try {
-        const existingUser = await prisma.user.findUnique({
-          where: { email },
-        });
-
-        if (existingUser) {
-          return res.status(400).json(errorResponse(`User with email ${email} already exists`));
-        }
-      } catch (error) {
-        console.error('Error checking existing user:', error);
-        return res.status(500).json(errorResponse('Database error while checking user existence'));
-      }
-
-      // Generate verification token and hash password
-      const verificationToken = crypto.randomBytes(32).toString('hex');
-      const hashedPassword = await bcrypt.hash(password, 12);
-
-      // Create new user
-      try {
-        const user = await prisma.user.create({
-          data: {
-            email,
-            password: hashedPassword,
-            name,
-            emailVerified: false,
-            verificationToken,
-            role: 'USER'
-          },
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            role: true,
-            createdAt: true,
-          },
-        });
-
-        // Send verification email
-        try {
-          await EmailService.sendVerificationEmail(email, verificationToken);
-        } catch (emailError) {
-          console.error('Error sending verification email:', emailError);
-          // Don't fail the signup if email fails, but log it
-        }
-
-        return res.status(201).json(
-          successResponse(
-            { message: 'Please check your email to verify your account' },
-            'User created successfully'
-          )
-        );
-      } catch (createError) {
-        console.error('Error creating user in database:', createError);
-        return res.status(500).json(errorResponse('Database error while creating user'));
-      }
-    } catch (error) {
-      console.error('Signup error:', error);
-      return res.status(500).json(errorResponse('Error creating user'));
+    // Input validation
+    if (!email || !password || !name) {
+      return res.status(400).json(errorResponse('All fields are required'));
     }
-  },
 
+    // Check for existing user with better error handling
+    let existingUser;
+    try {
+      existingUser = await prisma.user.findUnique({
+        where: { email },
+      });
+    } catch (dbError) {
+      console.error('Database error checking user:', dbError);
+      return res.status(500).json(errorResponse('Database error while checking user existence'));
+    }
+
+    if (existingUser) {
+      return res.status(400).json(errorResponse(`User with email ${email} already exists`));
+    }
+
+    // Generate verification token and hash password
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // Create new user with location data
+    try {
+      const user = await prisma.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          name,
+          emailVerified: false,
+          verificationToken,
+          role: 'USER',
+          location: location ? location : null, // Make location optional
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          createdAt: true,
+        },
+      });
+
+      // Send verification email
+      try {
+        await EmailService.sendVerificationEmail(email, verificationToken);
+      } catch (emailError) {
+        console.error('Error sending verification email:', emailError);
+        // Don't fail the signup if email fails
+      }
+
+      return res.status(201).json(
+        successResponse(
+          { message: 'Please check your email to verify your account' },
+          'User created successfully'
+        )
+      );
+    } catch (createError) {
+      console.error('Error creating user in database:', createError);
+      return res.status(500).json(errorResponse('Database error while creating user'));
+    }
+  } catch (error) {
+    console.error('Signup error:', error);
+    return res.status(500).json(errorResponse('Error creating user'));
+  }
+},
   login: async (req: Request, res: Response) => {
     try {
       const { email, password } = req.body;

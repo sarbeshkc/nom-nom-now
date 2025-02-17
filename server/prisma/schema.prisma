@@ -22,6 +22,8 @@ model User {
   verificationToken String?     @unique
   resetToken        String?   
   resetTokenExpiry  DateTime?
+    location    Json?    // Will store latitude and longitude
+
   restaurant        Restaurant?
   orders            Order[]
 }

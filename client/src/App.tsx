@@ -17,6 +17,9 @@ import MenuPage from "./pages/menu/page";
 import Home from "./pages/page";
 import CheckoutPage from "./pages/checkout/page";
 
+import HowToOrderPage from './pages/how-to-order/page';
+import ProfilePage from './pages/profile/page';
+
 // New auth-related page imports
 import EmailVerification from "@/pages/auth/EmailVerification";
 // import ForgotPassword from "@/pages/auth/ForgotPassword";
@@ -46,6 +49,13 @@ const router = createBrowserRouter(
           path: "menu", 
           element: <MenuPage /> 
         },
+
+        {
+path: "how-to-order",
+element: <HowToOrderPage/>
+        },
+
+
         { 
           path: "order", 
           element: (
@@ -66,6 +76,13 @@ const router = createBrowserRouter(
           path: "contact", 
           element: <ContactPage /> 
         },
+
+        
+        {
+          path:"profile",
+element:<ProfilePage/>
+        },
+
         { 
           path: "checkout", 
           element: (
