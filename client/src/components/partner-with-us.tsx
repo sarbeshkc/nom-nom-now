@@ -29,7 +29,13 @@ export function PartnerWithUs() {
               Join us as a partner and expand your reach in the culinary world. Showcase 
               your delicious creations to a broader audience through our platform.
             </p>
-            <div className="aspect-[2/1] bg-gray-200 rounded-2xl overflow-hidden" />
+            <div className="aspect-[2/1] bg-gray-200 rounded-2xl overflow-hidden">
+              <img 
+                src="/restaurant.png" 
+                alt="Delicious food" 
+                className="w-full h-full object-cover"
+              />
+            </div>
             <Link
               to="/partner"
               className="text-[#FF4D00] hover:text-[#ff6a33] font-medium inline-block"

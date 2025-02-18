@@ -21,7 +21,11 @@ export function DeliveringHappiness() {
       <div className="container mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="relative">
-            <div className="aspect-[4/3] bg-gray-200 rounded-lg mb-8" />
+            <img 
+              src="/moreabt.png" 
+              alt="Restaurant Image" 
+              className="w-full rounded-lg shadow-lg mb-8 object-cover aspect-[4/3]"
+            />
             <div className="bg-[#ff6a33] rounded-lg p-8 text-white">
               <h3 className="text-2xl font-semibold mb-6">Come and visit us</h3>
               <div className="space-y-4">
@@ -52,4 +56,3 @@ export function DeliveringHappiness() {
     </section>
   )
 }
-

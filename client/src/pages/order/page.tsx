@@ -4,62 +4,13 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/Footer'
 import { Package, MapPin } from 'lucide-react'
 import { useEffect, useRef } from 'react'
-import L from 'leaflet'
+import BasicMap from '@/components/ui/MapComponent'
 
 export default function OrderPage() {
-  const mapRef = useRef<L.Map | null>(null)
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (!mapRef.current) {
-        // Initialize map centered on Dhulikhel, Nepal
-        const map = L.map('map').setView([27.6257, 85.5387], 14)
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors'
-        }).addTo(map)
-
-        // Custom marker for restaurant
-        const restaurantIcon = L.divIcon({
-          className: 'custom-marker',
-          html: `<div class="w-4 h-4 rounded-full bg-[#FF4D00]"></div>`,
-          iconSize: [20, 20]
-        })
-
-        // Custom marker for delivery person
-        const deliveryIcon = L.divIcon({
-          className: 'custom-marker',
-          html: `<div class="w-6 h-6 rounded-full bg-blue-500 border-2 border-white"></div>`,
-          iconSize: [24, 24]
-        })
-
-        // Add markers
-        const restaurantMarker = L.marker([27.6257, 85.5387], { icon: restaurantIcon }).addTo(map)
-        const deliveryMarker = L.marker([27.6200, 85.5300], { icon: deliveryIcon }).addTo(map)
-
-        // Add route line
-        const routePoints = [
-          [27.6257, 85.5387],
-          [27.6200, 85.5300]
-        ]
-
-        // const routeLine = L.polyline(routePoints, {
-        //   color: '#FF4D00',
-        //   weight: 3,
-        //   dashArray: '5, 10'
-        // }).addTo(map)
-
-        mapRef.current = map
-      }
-    }
-
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove()
-        mapRef.current = null
-      }
-    }
-  }, [])
+  const handleLocationSelect = (lat, lng) => {
+    console.log(`Selected Location: Latitude: ${lat}, Longitude: ${lng}`);
+    // You can also update state or perform other actions based on the selected location
+  };
 
   return (
     <>
@@ -87,13 +38,9 @@ export default function OrderPage() {
                     <p className="text-[#FF4D00] mt-1">Rs. 250</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <button className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-md">
-                      -
-                    </button>
+                    <button className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-md">-</button>
                     <span className="w-8 text-center">2</span>
-                    <button className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-md">
-                      +
-                    </button>
+                    <button className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-md">+</button>
                   </div>
                 </div>
 
@@ -106,13 +53,9 @@ export default function OrderPage() {
                     <p className="text-[#FF4D00] mt-1">Rs. 180</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <button className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-md">
-                      -
-                    </button>
+                    <button className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-md">-</button>
                     <span className="w-8 text-center">1</span>
-                    <button className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-md">
-                      +
-                    </button>
+                    <button className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-md">+</button>
                   </div>
                 </div>
 
@@ -155,15 +98,7 @@ export default function OrderPage() {
                 <MapPin className="w-5 h-5 text-[#FF4D00]" />
                 <h2 className="text-xl font-semibold">Live Tracking</h2>
               </div>
-              <div className="relative">
-                <div id="map" className="h-[600px] w-full rounded-lg overflow-hidden" />
-                <div className="absolute top-4 right-4 bg-white py-2 px-4 rounded-lg shadow-md">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">Your order is on the way!</span>
-                    <button className="text-gray-400 hover:text-gray-600">×</button>
-                  </div>
-                </div>
-              </div>
+              <BasicMap onLocationSelect={handleLocationSelect} />
             </div>
           </div>
         </div>
@@ -172,4 +107,3 @@ export default function OrderPage() {
     </>
   )
 }
-

@@ -12,7 +12,7 @@ export default function ContactPage() {
       <main className="min-h-screen pt-24 pb-16 bg-gradient-to-b from-[#FFF5F2] to-white">
         <div className="container mx-auto px-6">
           <AboutSection />
-          <ContactTestimonials />
+          {/* <ContactTestimonials /> */}
           <TeamSection />
           <ContactForm />
         </div>

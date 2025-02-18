@@ -1,4 +1,3 @@
-// src/App.tsx
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from "@/contexts/AuthContext";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -16,14 +15,14 @@ import OrderPage from "@/pages/order/page";
 import MenuPage from "./pages/menu/page";
 import Home from "./pages/page";
 import CheckoutPage from "./pages/checkout/page";
-
 import HowToOrderPage from './pages/how-to-order/page';
 import ProfilePage from './pages/profile/page';
 
-// New auth-related page imports
+// Auth-related page imports
 import EmailVerification from "@/pages/auth/EmailVerification";
-// import ForgotPassword from "@/pages/auth/ForgotPassword";
-// import ResetPassword from "@/pages/auth/ResetPassword";
+
+// Payment-related page imports
+import { PaymentSuccess, PaymentFailure } from './components/payment/[result]';
 
 // Define the routes using createBrowserRouter
 const router = createBrowserRouter(
@@ -31,7 +30,7 @@ const router = createBrowserRouter(
     {
       path: "/",
       element: <MainLayout />,
-      errorElement: <ErrorBoundary />, // Add error boundary for route errors
+      errorElement: <ErrorBoundary />,
       children: [
         {
           index: true,
@@ -47,15 +46,16 @@ const router = createBrowserRouter(
         },
         { 
           path: "menu", 
-          element: <MenuPage /> 
+          element: (
+            <ProtectedRoute>
+              <MenuPage/>
+            </ProtectedRoute>
+          )
         },
-
         {
-path: "how-to-order",
-element: <HowToOrderPage/>
+          path: "how-to-order",
+          element: <HowToOrderPage/>
         },
-
-
         { 
           path: "order", 
           element: (
@@ -76,13 +76,14 @@ element: <HowToOrderPage/>
           path: "contact", 
           element: <ContactPage /> 
         },
-
-        
         {
-          path:"profile",
-element:<ProfilePage/>
+          path: "profile",
+          element: (
+            <ProtectedRoute>
+              <ProfilePage/>
+            </ProtectedRoute>
+          )
         },
-
         { 
           path: "checkout", 
           element: (
@@ -90,6 +91,28 @@ element:<ProfilePage/>
               <CheckoutPage />
             </ProtectedRoute>
           )
+        },
+        // Payment routes within MainLayout
+        {
+          path: "payment",
+          children: [
+            {
+              path: "success",
+              element: (
+                <ProtectedRoute>
+                  <PaymentSuccess />
+                </ProtectedRoute>
+              )
+            },
+            {
+              path: "failure",
+              element: (
+                <ProtectedRoute>
+                  <PaymentFailure />
+                </ProtectedRoute>
+              )
+            }
+          ]
         }
       ],
     },
@@ -106,14 +129,6 @@ element:<ProfilePage/>
       path: "/verify-email",
       element: <EmailVerification />,
     }
-    // {
-    //   path: "/forgot-password",
-    //   element: <ForgotPassword />,
-    // },
-    // {
-    //   path: "/reset-password",
-    //   element: <ResetPassword />,
-    // }
   ],
   {
     future: {

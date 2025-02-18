@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import { PrismaClient } from '@prisma/client';
 import { errorResponse } from './utils/response';
+import paymentRoutes from './routes/payment.route';
 
 dotenv.config();
 
@@ -32,6 +33,8 @@ app.get('/api/test-db', async (req, res) => {
 
 // Mount auth routes
 app.use('/api/auth', authRoutes);
+
+app.use('/api/payment', paymentRoutes);
 
 // Test endpoint
 app.get('/api/health', (req, res) => {

@@ -1,8 +1,12 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
+import landingPage from '../../public/landingpage.png';
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen">
+    <section 
+      className="relative min-h-screen bg-cover bg-center" 
+      style={{ backgroundImage: `url(${landingPage})` }} // Use landingPage.src here
+    >
       <div className="absolute inset-0 bg-black/50" />
       <div className="relative z-10 container mx-auto px-6 h-screen flex items-center">
         <div className="max-w-3xl text-white pt-16">
@@ -30,6 +34,5 @@ export function HeroSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
-

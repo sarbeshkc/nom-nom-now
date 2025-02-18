@@ -116,7 +116,8 @@ model Order {
   updatedAt           DateTime  @updatedAt
   restaurant          Restaurant @relation(fields: [restaurantId], references: [id])
   user                User      @relation(fields: [userId], references: [id])
-
+    transactionId    String?
+ 
   @@index([status])
   @@index([paymentStatus])
   @@index([createdAt])

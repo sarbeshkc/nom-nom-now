@@ -6,34 +6,31 @@ import { Header } from '@/components/header';
 import { Footer } from '@/components/Footer';
 import { Link } from "react-router-dom";
 
-// import Image from 'next/image';
-
 const HomePage = () => {
-  // Data moved inside the component for simplicity
   const popularDishes = [
     {
       name: "Spaghetti with meatballs",
       description: "Classic Italian pasta topped with savory meatballs.",
       price: 320,
-      image: "/placeholder.svg?height=200&width=200"
+      image: "/spawmeatballs.png" // Update with actual path
     },
     {
       name: "Steak with roasted veggies",
       description: "Tender steak paired with perfectly seasoned roasted vegetables.",
       price: 480,
-      image: "/placeholder.svg?height=200&width=200"
+      image: "/steak.png" // Update with actual path
     },
     {
       name: "Veg Thukpa with extra spice",
       description: "Spicy noodle soup bursting with Himalayan flavors.",
       price: 220,
-      image: "/placeholder.svg?height=200&width=200"
+      image: "/vegthukpa.png" // Update with actual path
     },
     {
       name: "Spicy Dumplings",
       description: "Flavorful dumplings with a fiery, irresistible spicy kick",
       price: 180,
-      image: "/placeholder.svg?height=200&width=200"
+      image: "/spicymo.png" // Update with actual path
     }
   ];
 
@@ -42,25 +39,25 @@ const HomePage = () => {
       name: "Spaghetti with meatballs",
       time: "15 minutes",
       portion: "2 Persons",
-      image: "/placeholder.svg?height=200&width=200"
+      image: "/spawmeatballs.png" // Update with actual path
     },
     {
       name: "Steak with roasted veggies",
       time: "30 minutes",
       portion: "4 Persons",
-      image: "/placeholder.svg?height=200&width=200"
+      image: "/steak.png" // Update with actual path
     },
     {
       name: "Veg Thukpa with extra spice",
       time: "25 minutes",
       portion: "1 Persons",
-      image: "/placeholder.svg?height=200&width=200"
+      image: "/vegthukpa.png" // Update with actual path
     },
     {
       name: "Spicy Dumplings",
       time: "30 minutes",
       portion: "2 Persons",
-      image: "/placeholder.svg?height=200&width=200"
+      image: "/spicymo.png" // Update with actual path
     }
   ];
 
@@ -68,26 +65,25 @@ const HomePage = () => {
     {
       name: "MoMo Mania",
       description: "Steamed, fried, and jhol momos.",
-      image: "/placeholder.svg?height=200&width=200"
+      image: "/momomania.png" // Update with actual path
     },
     {
       name: "Fast Food Fix",
       description: "Burgers, pizzas, and fried chicken.",
-      image: "/placeholder.svg?height=200&width=200"
+      image: "/fastfood.png" // Update with actual path
     },
     {
       name: "Newari Cuisine",
       description: "Yomari, bara, sekuwa, sukuti, and chhoyala.",
-      image: "/placeholder.svg?height=200&width=200"
+      image: "/newari.png" // Update with actual path
     },
     {
       name: "Stick Food Craze",
       description: "Potato sticks, sausage sticks, kima noodles, and tacos.",
-      image: "/placeholder.svg?height=200&width=200"
+      image: "/stick.png" // Update with actual path
     }
   ];
 
-  // Render the main component
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -114,39 +110,19 @@ const HomePage = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <Input placeholder="Search for dishes..." className="pl-10 bg-gray-50" />
                 </div>
-                {/* <Button className="bg-[#FF780B] hover:bg-[#F1954B]/90">
-                  How To Order
-                </Button> */}
-
-
-<Link to="/how-to-order">
-  <Button className="bg-[#FF780B] hover:bg-[#F1954B]/90">
-    How To Order
-  </Button>
-</Link>
-
-
-
+                <Link to="/how-to-order">
+                  <Button className="bg-[#FF780B] hover:bg-[#F1954B]/90">
+                    How To Order
+                  </Button>
+                </Link>
               </div>
             </div>
             <div className="relative h-[400px]">
               <div className="absolute top-0 right-0 w-48 h-48">
-                {/* <Image
-                  src="/placeholder.svg?height=200&width=200"
-                  alt="Food 1"
-                  width={200}
-                  height={200}
-                  className="rounded-full"
-                /> */}
+                <img src="/images/hero-food-1.png" alt="Food 1" className="rounded-full w-full h-full object-cover" />
               </div>
               <div className="absolute bottom-0 left-0 w-56 h-56">
-                {/* <Image
-                  src="/placeholder.svg?height=200&width=200"
-                  alt="Food 2"
-                  width={200}
-                  height={200}
-                  className="rounded-full"
-                /> */}
+                <img src="/images/hero-food-2.png" alt="Food 2" className="rounded-full w-full h-full object-cover" />
               </div>
             </div>
           </div>
@@ -164,13 +140,7 @@ const HomePage = () => {
             {popularDishes.map((dish, index) => (
               <div key={index} className="bg-gray-50 rounded-xl p-4">
                 <div className="aspect-square mb-4 rounded-lg overflow-hidden">
-                  {/* <Image
-                    src={dish.image}
-                    alt={dish.name}
-                    width={200}
-                    height={200}
-                    className="w-full h-full object-cover"
-                  /> */}
+                  <img src={dish.image} alt={dish.name} className="w-full h-full object-cover" />
                 </div>
                 <h3 className="text-xl font-semibold text-[#F1954B] mb-2">{dish.name}</h3>
                 <p className="text-gray-600 text-sm mb-4">{dish.description}</p>
@@ -197,13 +167,7 @@ const HomePage = () => {
             {newestRecipes.map((recipe, index) => (
               <div key={index} className="bg-gray-50 rounded-xl p-4">
                 <div className="aspect-square mb-4 rounded-lg overflow-hidden">
-                  {/* <Image
-                    src={recipe.image}
-                    alt={recipe.name}
-                    width={200}
-                    height={200}
-                    className="w-full h-full object-cover"
-                  /> */}
+                  <img src={recipe.image} alt={recipe.name} className="w-full h-full object-cover" />
                 </div>
                 <h3 className="text-xl font-semibold text-[#F1954B] mb-4">{recipe.name}</h3>
                 <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
@@ -238,19 +202,13 @@ const HomePage = () => {
                 reserve in real-time and enjoy exclusive perks!
               </p>
               <Link to="/reservation">
-  <Button className="bg-[#F1954B] hover:bg-[#F1954B]/90">
-    Make Reservation
-  </Button>
-</Link>
+                <Button className="bg-[#F1954B] hover:bg-[#F1954B]/90">
+                  Make Reservation
+                </Button>
+              </Link>
             </div>
             <div className="rounded-xl overflow-hidden h-[300px]">
-              {/* <Image
-                src="/placeholder.svg?height=300&width=500"
-                alt="Restaurant ambiance"
-                width={500}
-                height={300}
-                className="w-full h-full object-cover"
-              /> */}
+              <img src="/reservation.png" alt="Restaurant ambiance" className="w-full h-full object-cover" />
             </div>
           </div>
         </section>
@@ -262,13 +220,7 @@ const HomePage = () => {
             {categories.map((category, index) => (
               <div key={index} className="bg-gray-50 rounded-xl p-4 hover:shadow-lg transition-shadow">
                 <div className="aspect-square mb-4 rounded-lg overflow-hidden">
-                  {/* <Image
-                    src={category.image}
-                    alt={category.name}
-                    width={200}
-                    height={200}
-                    className="w-full h-full object-cover"
-                  /> */}
+                  <img src={category.image} alt={category.name} className="w-full h-full object-cover" />
                 </div>
                 <h3 className="text-xl font-semibold text-[#F1954B] mb-2">{category.name}</h3>
                 <p className="text-gray-600 text-sm mb-4">{category.description}</p>

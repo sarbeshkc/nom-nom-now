@@ -28,9 +28,9 @@ export function Footer() {
       <div className="container mx-auto px-6 py-12">
         <div className="mb-12">
           <img
-            src="/placeholder.svg"
+            src="logo-1.png"
             alt="Nom Nom Now"
-            className="h-12 w-auto"
+            className="h-15 w-14"
           />
         </div>
 
