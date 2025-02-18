@@ -1,22 +1,22 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { useNavigate } from "react-router-dom"
+import { useRouter } from "next/navigation"
 import { Check } from "lucide-react"
 import { useCartStore } from "@/store/cart-store"
 
 export function ConfirmationStep() {
-  const navigate = useNavigate()
+  const router = useRouter()
   const clearCart = useCartStore((state) => state.clearCart)
 
   const handleViewStatus = () => {
-    clearCart();
-    navigate("/order")
+    clearCart()
+    router.push("/order-tracking")
   }
 
   const handleOrderMore = () => {
     clearCart()
-    navigate("/menu")
+    router.push("/menu")
   }
 
   return (

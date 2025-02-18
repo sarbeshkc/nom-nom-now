@@ -8,6 +8,9 @@ import { DeliveryStep } from "@/components/checkout/delivery-step"
 import { SummaryStep } from "@/components/checkout/summary-step"
 import { PaymentStep } from "@/components/checkout/payment-step"
 import { ConfirmationStep } from "@/components/checkout/confirmation-step"
+import { StepNavigation } from "@/components/checkout/step-navigation"
+import { motion, AnimatePresence } from "framer-motion"
+import { Card } from "@/components/ui/card"
 
 type CheckoutStep = "cart" | "delivery" | "summary" | "payment" | "confirmation"
 
@@ -15,6 +18,7 @@ export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState<CheckoutStep>("cart")
   const [deliveryDetails, setDeliveryDetails] = useState({
     type: "delivery",
+    pickupType: "designated",
     province: "",
     district: "",
     municipality: "",
@@ -49,29 +53,27 @@ export default function CheckoutPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen pt-24 pb-16">
-        <div className="container mx-auto px-6">
-          <div className="flex gap-8">
+      <main className="min-h-screen pt-24 pb-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="flex gap-6">
             <div className="w-64 shrink-0">
-              <nav className="space-y-1">
-                {[
-                  { id: "cart", label: "Cart" },
-                  { id: "delivery", label: "Delivery" },
-                  { id: "summary", label: "Summary" },
-                  { id: "payment", label: "Payment" },
-                ].map((step) => (
-                  <div
-                    key={step.id}
-                    className={`p-4 rounded-lg ${
-                      currentStep === step.id ? "bg-[#FF4D00] text-white" : "text-gray-600"
-                    }`}
-                  >
-                    {step.label}
-                  </div>
-                ))}
-              </nav>
+              <StepNavigation currentStep={currentStep} />
             </div>
-            <div className="flex-1">{steps[currentStep]}</div>
+            <div className="flex-1">
+              <Card className="p-4">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentStep}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {steps[currentStep]}
+                  </motion.div>
+                </AnimatePresence>
+              </Card>
+            </div>
           </div>
         </div>
       </main>

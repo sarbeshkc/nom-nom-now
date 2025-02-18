@@ -1,11 +1,11 @@
 // src/App.tsx
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from "@/contexts/AuthContext";
-import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, useNavigate } from "react-router-dom";
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ProtectedRoute from "@/components/ProtectedRoute";
 import MainLayout from "@/layouts/MainLayout";
-
+import { Router } from 'react-router-dom';
 // Page imports grouped by feature
 // Auth-related pages
 import LoginPage from "@/pages/auth/LoginPage";
@@ -32,6 +32,10 @@ import RestaurantDashboardPage from "@/pages/restaurant/dashboard";
 // import RestaurantMenuPage from "@/pages/restaurant/menu";
 // import RestaurantOrdersPage from "@/pages/restaurant/orders";
 // import RestaurantSettingsPage from "@/pages/restaurant/settings";
+
+function App() {
+  return <RouterProvider router={router} />;
+}
 
 // Define route configurations for better organization
 const authRoutes = [

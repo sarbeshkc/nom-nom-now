@@ -52,7 +52,7 @@ export function GoogleLoginButton() {
           <span>Signing in...</span>
         ) : (
           <>
-            <img src="/google.svg" alt="Google" className="w-5 h-5 mr-2" />
+            <img src="client/src/assets/google.svg" alt="Google" className="w-5 h-5 mr-2" />
             Continue with Google
           </>
         )}
