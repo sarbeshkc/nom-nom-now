@@ -119,6 +119,18 @@ model MenuItem {
   updatedAt         DateTime  @updatedAt
   restaurant        Restaurant @relation(fields: [restaurantId], references: [id])
 
+
+    // New fields to add
+  allergens        String[]   // Store allergen information
+  nutritionalInfo  Json?      // Store nutritional values
+  popularityScore  Float      @default(0) // Track item popularity
+  specialTags      String[]   // For tags like "Spicy", "Vegan", "Chef's Special"
+  seasonal         Boolean    @default(false) // For seasonal menu items
+  discountPrice    Float?     // For special offers
+  ingredients      String[]   // List of main ingredients
+  servingSize      String?    // Portion size information
+  preparationNotes String?    // Special preparation instructions
+
   @@index([restaurantId])
   @@index([category])
 }
